@@ -178,7 +178,7 @@ useEffect(() => {
         </form>
 
         {reviews.map((review, index) => (
-          <div key={index} className="bg-gray-100 rounded p-3 mb-2">
+          <div key={index} className="border border-amber-100 rounded p-3 mb-2">
             <p className="font-semibold">{review.userName}</p>
             <p>{review.review}</p>
           </div>

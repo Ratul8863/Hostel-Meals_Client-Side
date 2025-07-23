@@ -1,136 +1,109 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
-import { FaEye, FaCheck, FaTimes } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
 
-const PendingMeals = () => {
-    const [selectedRider, setSelectedRider] = useState(null);
-    const axiosSecure = useAxiosSecure();
+const RequestedMeals = () => {
+  const [search, setSearch] = useState("");
+  const axiosSecure = useAxiosSecure();
 
-    const { isPending, data: riders = [], refetch } = useQuery({
-        queryKey: ['pending-riders'],
-        queryFn: async () => {
-            const res = await axiosSecure.get("/meals/request");
-            return res.data;
-        }
-    })
+  const { isPending, data: meals = [], refetch } = useQuery({
+    queryKey: ["requested-meals", search],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/meals/request?search=${search}`);
+      return res.data;
+    },
+  });
 
-    if (isPending) {
-        return '...loading'
+  const handleServe = async (id) => {
+    const confirm = await Swal.fire({
+      title: "Mark as Delivered?",
+      text: "This will mark the meal as delivered.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Serve",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await axiosSecure.patch(`/meals/${id}/status`, {
+        status: "delivered",
+      });
+      await refetch();
+      Swal.fire("Success", "Meal marked as delivered.", "success");
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", "Failed to update meal status", "error");
     }
+  };
 
-    const handleDecision = async (id, action, email) => {
-        const confirm = await Swal.fire({
-            title: `${action === "approve" ? "Approve" : "Reject"} Application?`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes",
-            cancelButtonText: "Cancel",
-        });
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-semibold mb-4">Requested Meals</h2>
 
-        if (!confirm.isConfirmed) return;
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by name or email..."
+          className="input input-bordered w-full max-w-md"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
 
-        try {
-            const status = action === "approve" ? "active" : "rejected"
-            await axiosSecure.patch(`/meals/${id}/status`, {
-                status,
-                email
-            });
+      {isPending ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="table table-zebra w-full">
+            <thead>
+              <tr>
+                <th>Meal Title</th>
+                <th>User Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Serve</th>
+              </tr>
+            </thead>
+            <tbody>
+              {meals.map((meal) => (
+                <tr key={meal._id}>
+                  <td>{meal.mealTitle}</td>
+                  <td>{meal.userName}</td>
+                  <td>{meal.userEmail}</td>
+                  <td>
+                    <span
+                      className={`badge ${
+                        meal.status === "delivered"
+                          ? "badge-success"
+                          : "badge-warning"
+                      }`}
+                    >
+                      {meal.status}
+                    </span>
+                  </td>
+                  <td>
+                    {meal.status !== "delivered" && (
+                      <button
+                        className="btn btn-sm btn-success"
+                        onClick={() => handleServe(meal._id)}
+                      >
+                        <FaCheck /> Serve
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-            refetch();
-
-            Swal.fire("Success", `Rider ${action}d successfully`, "success");
-
-        } catch (err) {
-            Swal.fire("Error", "Could not update rider status", err);
-        }
-    };
-
-    return (
-        <div className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">Pending Rider Applications</h2>
-
-            <div className="overflow-x-auto">
-                <table className="table table-zebra w-full">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Region</th>
-                            <th>District</th>
-                           
-                            <th>Applied</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {riders.map((rider) => (
-                            <tr key={rider._id}>
-                                <td>{rider.userName}</td>
-                                <td>{rider.userEmail}</td>
-                                <td>{rider.mealTitle}</td>
-                                <td>{rider.status}</td>
-                            
-                                <td>{new Date(rider.created_at).toLocaleDateString()}</td>
-                                <td className="flex gap-2">
-                                    <button
-                                        onClick={() => setSelectedRider(rider)}
-                                        className="btn btn-sm btn-info"
-                                    >
-                                        <FaEye />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDecision(rider._id, "approve", rider.userEmail)}
-                                        className="btn btn-sm btn-success"
-                                    >
-                                        <FaCheck />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDecision(rider._id, "reject", rider.userEmail)}
-                                        className="btn btn-sm btn-error"
-                                    >
-                                        <FaTimes />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Modal for viewing rider details */}
-            {selectedRider && (
-                <dialog id="riderDetailsModal" className="modal modal-open">
-                    <div className="modal-box max-w-2xl">
-                        <h3 className="font-bold text-xl mb-2">Rider Details</h3>
-                        <div className="space-y-2">
-                            <p><strong>Name:</strong> {selectedRider.name}</p>
-                            <p><strong>Email:</strong> {selectedRider.email}</p>
-                            <p><strong>Phone:</strong> {selectedRider.phone}</p>
-                            <p><strong>Age:</strong> {selectedRider.age}</p>
-                            <p><strong>NID:</strong> {selectedRider.nid}</p>
-                            <p><strong>Bike Brand:</strong> {selectedRider.bike_brand}</p>
-                            <p><strong>Bike Registration:</strong> {selectedRider.bike_registration}</p>
-                            <p><strong>Region:</strong> {selectedRider.region}</p>
-                            <p><strong>District:</strong> {selectedRider.district}</p>
-                            <p><strong>Applied At:</strong> {new Date(selectedRider.created_at).toLocaleString()}</p>
-                            {selectedRider.note && <p><strong>Note:</strong> {selectedRider.note}</p>}
-                        </div>
-
-                        <div className="modal-action mt-4">
-                            <button
-                                className="btn btn-outline"
-                                onClick={() => setSelectedRider(null)}
-                            >
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                </dialog>
-            )}
+          {meals.length === 0 && <p className="text-center mt-4">No meals found.</p>}
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
-export default PendingMeals;
+export default RequestedMeals;

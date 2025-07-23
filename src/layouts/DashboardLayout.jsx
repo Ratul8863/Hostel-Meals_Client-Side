@@ -151,6 +151,16 @@ const DashboardLayout = () => {
                                     Pending Meals
                                 </NavLink>
                             </li>
+
+
+
+ <li>
+                                <NavLink to="/dashboard/upcoming-meals">
+                                    <FaUserClock className="inline-block mr-2" />
+                                   Upcoming Meals
+                                </NavLink>
+                            </li>
+
                         </>
                     }
                 </ul>

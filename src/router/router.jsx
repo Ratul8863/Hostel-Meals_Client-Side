@@ -31,6 +31,8 @@ import MealsPage from "../pages/Home/MealsByCategory/MealsPage";
 import MembershipSection from "../pages/Home/MembershipSection/MembershipSection";
 import CheckoutPage from "../pages/Home/MembershipSection/CheckoutPage";
 import PendingMeals from "../pages/Dashboard/PendingMeals/PendingMeals";
+import UpcomingMeals from "../pages/Dashboard/UpcomingMeals/UpcomingMeals";
+import UpcomingMealsUser from "../pages/UpcomingMealsUser/UpcomingMealsUser";
 
 export const router = createBrowserRouter([
   {
@@ -57,6 +59,12 @@ export const router = createBrowserRouter([
        {
         path: 'meals',
         Component: MealsPage
+      },
+
+
+       {
+        path: 'UpcomingMealsUser',
+        Component: UpcomingMealsUser
       },
       {
         path: 'beARider',
@@ -168,6 +176,11 @@ export const router = createBrowserRouter([
   path: '/dashboard/add-meal',
   element: <AdminRoute><AddMeal></AddMeal></AdminRoute>
 },
+{
+  path: '/dashboard/upcoming-meals',
+  element: <UpcomingMeals></UpcomingMeals>
+},
+
       {
   path: '/dashboard/all-meals',
   element: <AdminRoute><AllMeals></AllMeals></AdminRoute>

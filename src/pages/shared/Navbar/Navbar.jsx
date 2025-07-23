@@ -17,7 +17,7 @@ const Navbar = () => {
     const navItems = <>
         <li><NavLink to="/">Home</NavLink></li>
         <li><NavLink to="/meals">Meals</NavLink></li>
-        <li><NavLink to="/upcomingMeals">Upcoming Meals</NavLink></li>
+        <li><NavLink to="/UpcomingMealsUser">Upcoming Meals</NavLink></li>
          <li><NavLink to="/sendParcel">Upcoming Meals</NavLink></li>
          <li><NavLink to="/beARider">Upcoming beARider</NavLink></li>
     </>;
