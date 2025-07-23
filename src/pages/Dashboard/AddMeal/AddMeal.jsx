@@ -134,6 +134,31 @@ const AddMeal = () => {
                     {errors.image && <p className="text-red-500 text-sm">Image is required</p>}
                 </div>
 
+
+
+ <div>
+                    <label className="label">Distributor name</label>
+                    <input
+                        type="text"
+                        className="input input-bordered w-full"
+                       placeholder={user?.displayName}
+                        readOnly
+                    />
+                    {errors.title && <p className="text-red-500 text-sm">Meal title is required</p>}
+                </div>
+
+
+ <div>
+                    <label className="label">Meal Title</label>
+                    <input
+                        type="text"
+                        className="input input-bordered w-full"
+                         placeholder={user?.email}
+                         readOnly
+                    />
+                    {errors.title && <p className="text-red-500 text-sm">Meal title is required</p>}
+                </div>
+
                 {/* Submit Button */}
                 <button
                     type="submit"

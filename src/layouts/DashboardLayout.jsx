@@ -72,7 +72,7 @@ const DashboardLayout = () => {
                     <li>
                         <NavLink to="/dashboard/profile">
                             <FaUserEdit className="inline-block mr-2" />
-                            Update Profile
+                             Profile
                         </NavLink>
                     </li>
                     {/* rider links */}
@@ -101,31 +101,31 @@ const DashboardLayout = () => {
                     {/* admin link */}
                     {!roleLoading && role === 'admin' &&
                         <>
-                         <li>
+                         {/* <li>
                                 <NavLink to="/dashboard/assign-rider">
                                     <FaMotorcycle className="inline-block mr-2" />
                                     Profile
                                 </NavLink>
-                            </li>
-                            <li>
+                            </li> */}
+                            {/* <li>
                                 <NavLink to="/dashboard/assign-rider">
                                     <FaMotorcycle className="inline-block mr-2" />
                                     Assign Rider
                                 </NavLink>
-                            </li>
-                            <li>
+                            </li> */}
+                            {/* <li>
                                 <NavLink to="/dashboard/active-riders">
                                     <FaUserCheck className="inline-block mr-2" />
                                     Active Riders
                                 </NavLink>
-                            </li>
-        
+                            </li> */}
+{/*         
                             <li>
                                 <NavLink to="/dashboard/pending-riders">
                                     <FaUserClock className="inline-block mr-2" />
                                     Pending Riders
                                 </NavLink>
-                            </li>
+                            </li> */}
                             <li>
                                 <NavLink to="/dashboard/makeAdmin">
                                     <FaUserShield className="inline-block mr-2" />

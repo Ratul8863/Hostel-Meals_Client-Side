@@ -24,6 +24,7 @@ const Register = () => {
             // Save user info in DB
             const userInfo = {
                 email: data.email,
+                 name: data.name,
                 role: 'user',
                 membership: 'Bronze',
                 created_at: new Date().toISOString(),

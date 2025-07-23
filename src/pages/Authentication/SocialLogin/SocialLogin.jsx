@@ -18,6 +18,7 @@ const SocialLogin = () => {
                 // update userinfo in the database
                 const userInfo = {
                     email: user.email,
+                    name: user.displayName,
                     role: 'user', // default role
                      membership: 'Bronze',
                     created_at: new Date().toISOString(),

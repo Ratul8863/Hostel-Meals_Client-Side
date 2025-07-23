@@ -9,17 +9,21 @@ const MakeAdmin = () => {
     const [emailQuery, setEmailQuery] = useState("");
 
     const {
-        data: users = [],
-        refetch,
-        isFetching,
-    } = useQuery({
-        queryKey: ["searchedUsers", emailQuery],
-        enabled: !!emailQuery,
-        queryFn: async () => {
-            const res = await axiosSecure.get(`/users/search?email=${emailQuery}`);
-            return res.data;
-        },
-    });
+    data: users = [],
+    refetch,
+    isFetching,
+} = useQuery({
+    queryKey: ["searchedUsers", emailQuery],
+    queryFn: async () => {
+        const res = await axiosSecure.get(
+            emailQuery
+                ? `/users/search?email=${emailQuery}`
+                : `/users` // <-- get all users when search is empty
+        );
+        return res.data;
+    },
+});
+
 
     const { mutateAsync: updateRole } = useMutation({
         mutationFn: async ({ id, role }) =>
@@ -76,49 +80,56 @@ const MakeAdmin = () => {
             {users.length > 0 && (
                 <div className="overflow-x-auto">
                     <table className="table w-full table-zebra">
-                        <thead>
-                            <tr>
-                                <th>Email</th>
-                                <th>Created At</th>
-                                <th>Role</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.map((u) => (
-                                <tr key={u._id}>
-                                    <td>{u.email}</td>
-                                    <td>{new Date(u.created_at).toLocaleDateString()}</td>
-                                    <td>
-                                        <span
-                                            className={`badge ${u.role === "admin" ? "badge-success" : "badge-ghost"
-                                                }`}
-                                        >
-                                            {u.role || "user"}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <button
-                                            onClick={() => handleRoleChange(u._id, u.role || "user")}
-                                            className={`btn btn-sm text-black ${u.role === "admin" ? "btn-error" : "btn-primary"
-                                                }`}
-                                        >
-                                            {u.role === "admin" ? (
-                                                <>
-                                                    <FaUserTimes className="mr-1" />
-                                                    Remove Admin
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <FaUserShield className="mr-1" />
-                                                    Make Admin
-                                                </>
-                                            )}
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
+                      <thead>
+    <tr>
+        <th>Email</th>
+        <th>Name</th>
+        <th>Subscription</th>
+        <th>Created At</th>
+        <th>Role</th>
+        <th>Action</th>
+    </tr>
+</thead>
+<tbody>
+    {users.map((u) => (
+        <tr key={u._id}>
+            <td>{u.email}</td>
+            <td>{u.name}</td>
+            <td>
+                <span className="badge badge-outline">
+                    {u.membership || "free"}
+                </span>
+            </td>
+            <td>{new Date(u.created_at).toLocaleDateString()}</td>
+            <td>
+                <span
+                    className={`badge ${u.role === "admin" ? "badge-success" : "badge-ghost"}`}
+                >
+                    {u.role || "user"}
+                </span>
+            </td>
+            <td>
+                <button
+                    onClick={() => handleRoleChange(u._id, u.role || "user")}
+                    className={`btn btn-sm text-black ${u.role === "admin" ? "btn-error" : "btn-primary"}`}
+                >
+                    {u.role === "admin" ? (
+                        <>
+                            <FaUserTimes className="mr-1" />
+                            Remove Admin
+                        </>
+                    ) : (
+                        <>
+                            <FaUserShield className="mr-1" />
+                            Make Admin
+                        </>
+                    )}
+                </button>
+            </td>
+        </tr>
+    ))}
+</tbody>
+
                     </table>
                 </div>
             )}

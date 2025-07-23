@@ -33,6 +33,7 @@ import CheckoutPage from "../pages/Home/MembershipSection/CheckoutPage";
 import PendingMeals from "../pages/Dashboard/PendingMeals/PendingMeals";
 import UpcomingMeals from "../pages/Dashboard/UpcomingMeals/UpcomingMeals";
 import UpcomingMealsUser from "../pages/UpcomingMealsUser/UpcomingMealsUser";
+import ProfileSection from "../pages/Dashboard/ProfileSection/ProfileSection";
 
 export const router = createBrowserRouter([
   {
@@ -125,6 +126,10 @@ export const router = createBrowserRouter([
       {
         path: 'track',
         Component: TrackParcel
+      },
+      {
+        path: 'profile',
+        Component: ProfileSection
       },
       {
       path: 'payment/membership/:packageName',  // ✅ New route for membership payment
