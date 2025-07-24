@@ -7,6 +7,9 @@ import BeMerchant from '../BeMerchant/BeMerchant';
 import BannerSection from '../BannerSection/BannerSection';
 import MealsByCategory from '../MealsByCategory/MealsByCategory';
 import MembershipSection from '../MembershipSection/MembershipSection';
+import CustomerTestimonials from '../CustomerTestimonials/CustomerTestimonials';
+import TopRatedMeals from '../TopRatedMeals/TopRatedMeals';
+import MeetOurTeam from '../MeetOurTeam/MeetOurTeam';
 
 const Home = () => {
     return (
@@ -15,6 +18,9 @@ const Home = () => {
     
             <MealsByCategory></MealsByCategory>
             <MembershipSection></MembershipSection>
+            <CustomerTestimonials></CustomerTestimonials>
+            <TopRatedMeals></TopRatedMeals>
+            <MeetOurTeam></MeetOurTeam>
             
         </div>
     );

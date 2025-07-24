@@ -17,6 +17,7 @@ const PaymentHistory = () => {
         }
     })
 
+    console.log(payments)
     if (isPending) {
         return '...loading'
     }
@@ -38,8 +39,8 @@ const PaymentHistory = () => {
                         payments.map((p, index) => (
                             <tr key={p.transactionId}>
                                 <td>{index + 1}</td>
-                                <td className="truncate" title={p.parcelId}>
-                                    {p.parcelId}...
+                                <td  title={p.packageName}>
+                                    {p.packageName}
                                 </td>
                                 <td>৳{p.amount}</td>
                                 <td className="font-mono text-sm">

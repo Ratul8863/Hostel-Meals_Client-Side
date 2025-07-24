@@ -51,6 +51,13 @@ const DashboardLayout = () => {
                             Home
                         </NavLink>
                     </li>
+
+                      <li>
+                        <NavLink to="/">
+                            <FaHome className="inline-block mr-2" />
+                            Home
+                        </NavLink>
+                    </li>
                     <li>
                         <NavLink to="/dashboard/myParcels">
                             <FaBoxOpen className="inline-block mr-2" />
@@ -75,6 +82,22 @@ const DashboardLayout = () => {
                              Profile
                         </NavLink>
                     </li>
+
+                      <li>
+                            <NavLink to="/dashboard/my-meal-request">
+                                <FaWallet className="inline-block mr-2" />
+                                My Requested Meals
+                            </NavLink>
+                        </li>
+
+
+ <li>
+                            <NavLink to="/dashboard/my-meal-reviews">
+                                <FaWallet className="inline-block mr-2" />
+                                My Reviews
+                            </NavLink>
+                        </li>
+
                     {/* rider links */}
                     {!roleLoading && role === 'rider' && <>
                         <li>
@@ -95,6 +118,9 @@ const DashboardLayout = () => {
                                 My Earnings
                             </NavLink>
                         </li>
+                      
+
+
                     </>}
 
 

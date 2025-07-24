@@ -34,6 +34,8 @@ import PendingMeals from "../pages/Dashboard/PendingMeals/PendingMeals";
 import UpcomingMeals from "../pages/Dashboard/UpcomingMeals/UpcomingMeals";
 import UpcomingMealsUser from "../pages/UpcomingMealsUser/UpcomingMealsUser";
 import ProfileSection from "../pages/Dashboard/ProfileSection/ProfileSection";
+import MyRequestedMeals from "../pages/Dashboard/MyRequestedMeals/MyRequestedMeals";
+import MyReviews from "../pages/Dashboard/MyReviews/MyReviews";
 
 export const router = createBrowserRouter([
   {
@@ -152,6 +154,19 @@ export const router = createBrowserRouter([
           <MyEarnings></MyEarnings>
         </RiderRoute>
       },
+      {
+        path: 'my-meal-request',
+        element: 
+        <MyRequestedMeals></MyRequestedMeals>
+        
+      },
+      {
+        path: 'my-meal-reviews',
+        element: 
+     <MyReviews></MyReviews>
+        
+      },
+
       // admin only routes
       {
         path: 'assign-rider',

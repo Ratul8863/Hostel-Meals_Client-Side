@@ -104,7 +104,7 @@ useEffect(() => {
       Swal.fire('Error', 'Failed to submit meal request.', 'error');
     }
   };
-
+console.log(meal)
   // Submit review
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -116,8 +116,10 @@ useEffect(() => {
     try {
       await axiosSecure.post('/reviews', {
         mealId: id,
+         mealTitle: meal.title,
         userName: user.displayName,
         userEmail: user.email,
+        likes: meal.likes,
         review: reviewText
       });
 
