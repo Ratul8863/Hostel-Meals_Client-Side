@@ -58,24 +58,24 @@ const DashboardLayout = () => {
                             Home
                         </NavLink>
                     </li>
-                    <li>
+                    {/* <li>
                         <NavLink to="/dashboard/myParcels">
                             <FaBoxOpen className="inline-block mr-2" />
                             My Parcels
                         </NavLink>
-                    </li>
+                    </li> */}
                     <li>
                         <NavLink to="/dashboard/paymentHistory">
                             <FaMoneyCheckAlt className="inline-block mr-2" />
                             Payment History
                         </NavLink>
                     </li>
-                    <li>
+                    {/* <li>
                         <NavLink to="/dashboard/track">
                             <FaSearchLocation className="inline-block mr-2" />
                             Track a Package
                         </NavLink>
-                    </li>
+                    </li> */}
                     <li>
                         <NavLink to="/dashboard/profile">
                             <FaUserEdit className="inline-block mr-2" />
@@ -83,7 +83,12 @@ const DashboardLayout = () => {
                         </NavLink>
                     </li>
 
-                      <li>
+                     
+
+
+
+ {!roleLoading && role === 'user' && <>
+  <li>
                             <NavLink to="/dashboard/my-meal-request">
                                 <FaWallet className="inline-block mr-2" />
                                 My Requested Meals
@@ -97,6 +102,16 @@ const DashboardLayout = () => {
                                 My Reviews
                             </NavLink>
                         </li>
+
+ </>
+
+}
+
+
+
+
+
+
 
                     {/* rider links */}
                     {!roleLoading && role === 'rider' && <>
@@ -155,7 +170,7 @@ const DashboardLayout = () => {
                             <li>
                                 <NavLink to="/dashboard/makeAdmin">
                                     <FaUserShield className="inline-block mr-2" />
-                                    Make Admin
+                                    Manage Users
                                 </NavLink>
                             </li>
 
@@ -184,6 +199,12 @@ const DashboardLayout = () => {
                                 <NavLink to="/dashboard/upcoming-meals">
                                     <FaUserClock className="inline-block mr-2" />
                                    Upcoming Meals
+                                </NavLink>
+                            </li>
+ <li>
+                                <NavLink to="/dashboard/all-reviews">
+                                    <FaUserClock className="inline-block mr-2" />
+                                  All Reviews
                                 </NavLink>
                             </li>
 

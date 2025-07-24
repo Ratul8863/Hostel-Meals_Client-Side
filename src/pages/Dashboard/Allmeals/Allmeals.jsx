@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
-
-import { Link } from 'react-router';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
+import { Link } from 'react-router';
 
 const AllMeals = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
   const [sortBy, setSortBy] = useState('');
+  const [editingMeal, setEditingMeal] = useState(null); // meal being edited
 
-  // Fetch meals from server
   const { data: meals = [], isLoading } = useQuery({
     queryKey: ['meals', sortBy],
     queryFn: async () => {
@@ -19,7 +18,6 @@ const AllMeals = () => {
     }
   });
 
-  // Delete meal mutation
   const deleteMealMutation = useMutation({
     mutationFn: async (mealId) => {
       const res = await axiosSecure.delete(`/meals/${mealId}`);
@@ -31,6 +29,21 @@ const AllMeals = () => {
     },
     onError: () => {
       Swal.fire('Error', 'Failed to delete meal.', 'error');
+    }
+  });
+
+  const updateMealMutation = useMutation({
+    mutationFn: async ({ id, data }) => {
+      const res = await axiosSecure.patch(`/meals/${id}`, data);
+      return res.data;
+    },
+    onSuccess: () => {
+      Swal.fire('Updated!', 'Meal updated successfully.', 'success');
+      setEditingMeal(null);
+      queryClient.invalidateQueries(['meals']);
+    },
+    onError: () => {
+      Swal.fire('Error', 'Failed to update meal.', 'error');
     }
   });
 
@@ -46,6 +59,17 @@ const AllMeals = () => {
         deleteMealMutation.mutate(mealId);
       }
     });
+  };
+
+  const handleUpdateSubmit = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const updatedData = {
+      title: form.title.value,
+      price: parseFloat(form.price.value),
+      description: form.description.value
+    };
+    updateMealMutation.mutate({ id: editingMeal._id, data: updatedData });
   };
 
   return (
@@ -91,8 +115,8 @@ const AllMeals = () => {
                       <td>{meal.rating}</td>
                       <td>{meal.distributorName || 'N/A'}</td>
                       <td className="flex gap-2 flex-wrap">
-                        <Link to={`/dashboard/viewMeal/${meal._id}`} className="btn btn-sm btn-info">View</Link>
-                        <Link to={`/dashboard/updateMeal/${meal._id}`} className="btn btn-sm btn-warning">Update</Link>
+                        <Link to={`/meal/${meal._id}`} className="btn btn-sm btn-info">View</Link>
+                        <button onClick={() => setEditingMeal(meal)} className="btn btn-sm btn-warning">Edit</button>
                         <button onClick={() => handleDelete(meal._id)} className="btn btn-sm btn-error">Delete</button>
                       </td>
                     </tr>
@@ -101,6 +125,25 @@ const AllMeals = () => {
               </tbody>
             </table>
           </div>
+      }
+
+      {/* Modal */}
+      {
+        editingMeal &&
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-md w-full max-w-md relative">
+            <h3 className="text-xl font-semibold mb-4">Edit Meal</h3>
+            <form onSubmit={handleUpdateSubmit} className="space-y-4">
+              <input type="text" name="title" defaultValue={editingMeal.title} placeholder="Title" className="input input-bordered w-full" />
+              <input type="number" name="price" defaultValue={editingMeal.price} placeholder="Price" className="input input-bordered w-full" />
+              <textarea name="description" defaultValue={editingMeal.description} placeholder="Description" className="textarea textarea-bordered w-full" />
+              <div className="flex justify-end gap-3">
+                <button type="button" className="btn btn-outline" onClick={() => setEditingMeal(null)}>Cancel</button>
+                <button type="submit" className="btn btn-success">Update</button>
+              </div>
+            </form>
+          </div>
+        </div>
       }
     </div>
   );

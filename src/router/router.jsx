@@ -36,6 +36,7 @@ import UpcomingMealsUser from "../pages/UpcomingMealsUser/UpcomingMealsUser";
 import ProfileSection from "../pages/Dashboard/ProfileSection/ProfileSection";
 import MyRequestedMeals from "../pages/Dashboard/MyRequestedMeals/MyRequestedMeals";
 import MyReviews from "../pages/Dashboard/MyReviews/MyReviews";
+import AllReviews from "../pages/Dashboard/AllReviews/AllReviews";
 
 export const router = createBrowserRouter([
   {
@@ -204,6 +205,10 @@ export const router = createBrowserRouter([
       {
   path: '/dashboard/all-meals',
   element: <AdminRoute><AllMeals></AllMeals></AdminRoute>
+},
+      {
+  path: '/dashboard/all-reviews',
+  element: <AdminRoute><AllReviews></AllReviews></AdminRoute>
 },
 
 
