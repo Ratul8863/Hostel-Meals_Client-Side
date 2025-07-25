@@ -67,14 +67,14 @@ const DashboardLayout = () => {
                     </li>
 
                     {/* Common Dashboard Links */}
-                    <li>
+                    {/* <li>
                         <NavLink to="/dashboard" className={sidebarNavLinkClasses}>
                             <FaHome className="inline-block mr-3 text-xl" />
-                            Dashboard Home
+                            My Profile
                         </NavLink>
-                    </li>
+                    </li> */}
                     <li>
-                        <NavLink to="/dashboard/profile" className={sidebarNavLinkClasses}>
+                        <NavLink to="/dashboard" className={sidebarNavLinkClasses}>
                             <FaUserEdit className="inline-block mr-3 text-xl" />
                             My Profile
                         </NavLink>

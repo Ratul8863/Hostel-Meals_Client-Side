@@ -108,7 +108,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        Component: DashboardHome
+        Component: ProfileSection
       },
       {
         path: 'myParcels',

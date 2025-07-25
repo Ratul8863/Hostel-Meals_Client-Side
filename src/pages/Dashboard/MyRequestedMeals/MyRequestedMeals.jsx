@@ -7,7 +7,7 @@ import withReactContent from 'sweetalert2-react-content'; // Import for custom S
 import { FaUtensils, FaHeart, FaStar, FaTimesCircle, FaClipboardList } from 'react-icons/fa'; // Icons for table headers and actions
 
 const MySwal = withReactContent(Swal); // Initialize SweetAlert with React content
-const ITEMS_PER_PAGE = 8; // Consistent items per page
+const ITEMS_PER_PAGE = 10; // Consistent items per page
 
 const MyRequestedMeals = () => {
   const { user, loading: authLoading } = useAuth(); // Get authLoading state
