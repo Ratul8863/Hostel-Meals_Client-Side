@@ -251,7 +251,7 @@ const MealDetail = () => {
 
               <button
                 onClick={handleRequest}
-                className="inline-flex items-center justify-center px-8 py-3 bg-gray-800 text-white hover:bg-gray-900 text-white font-semibold rounded-lg hover:bg-primary-light transition-colors duration-200 text-lg" // Consistent button style
+                className="inline-flex items-center justify-center px-8 py-3 bg-gray-800  hover:bg-gray-900 text-white font-semibold rounded-lg hover:bg-primary-light transition-colors duration-200 text-lg" // Consistent button style
               >
                 🍽️ Request Meal
               </button>
