@@ -16,28 +16,31 @@ const RequestedMeals = () => {
     },
   });
 
-  const handleServe = async (id) => {
-    const confirm = await Swal.fire({
-      title: "Mark as Delivered?",
-      text: "This will mark the meal as delivered.",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Yes, Serve",
+  const handleServe = async (id, currentStatus) => {
+  if (currentStatus === "delivered") return;
+
+  const confirm = await Swal.fire({
+    title: "Mark as Delivered?",
+    text: "This will mark the meal as delivered.",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Yes, Serve",
+  });
+
+  if (!confirm.isConfirmed) return;
+
+  try {
+    await axiosSecure.patch(`/meals/${id}/status`, {
+      status: "delivered",
     });
+    await refetch();
+    Swal.fire("Success", "Meal marked as delivered.", "success");
+  } catch (err) {
+    console.error(err);
+    Swal.fire("Error", "Failed to update meal status", "error");
+  }
+};
 
-    if (!confirm.isConfirmed) return;
-
-    try {
-      await axiosSecure.patch(`/meals/${id}/status`, {
-        status: "delivered",
-      });
-      await refetch();
-      Swal.fire("Success", "Meal marked as delivered.", "success");
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "Failed to update meal status", "error");
-    }
-  };
 
   return (
     <div className="p-6">

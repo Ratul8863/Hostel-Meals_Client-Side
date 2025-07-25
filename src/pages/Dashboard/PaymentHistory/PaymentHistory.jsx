@@ -28,7 +28,7 @@ const PaymentHistory = () => {
                 <thead className="bg-base-200 text-base font-semibold">
                     <tr>
                         <th>#</th>
-                        <th>Parcel ID</th>
+                        <th>title</th>
                         <th>Amount</th>
                         <th>Transaction</th>
                         <th>Paid At</th>

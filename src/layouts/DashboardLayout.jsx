@@ -48,7 +48,7 @@ const DashboardLayout = () => {
                     <li>
                         <NavLink to="/dashboard">
                             <FaHome className="inline-block mr-2" />
-                            Home
+                            Dashboard
                         </NavLink>
                     </li>
 
@@ -58,24 +58,14 @@ const DashboardLayout = () => {
                             Home
                         </NavLink>
                     </li>
-                    {/* <li>
-                        <NavLink to="/dashboard/myParcels">
-                            <FaBoxOpen className="inline-block mr-2" />
-                            My Parcels
-                        </NavLink>
-                    </li> */}
+                  
                     <li>
                         <NavLink to="/dashboard/paymentHistory">
                             <FaMoneyCheckAlt className="inline-block mr-2" />
                             Payment History
                         </NavLink>
                     </li>
-                    {/* <li>
-                        <NavLink to="/dashboard/track">
-                            <FaSearchLocation className="inline-block mr-2" />
-                            Track a Package
-                        </NavLink>
-                    </li> */}
+                    
                     <li>
                         <NavLink to="/dashboard/profile">
                             <FaUserEdit className="inline-block mr-2" />
@@ -189,7 +179,7 @@ const DashboardLayout = () => {
  <li>
                                 <NavLink to="/dashboard/pending-meals">
                                     <FaUserClock className="inline-block mr-2" />
-                                    Pending Meals
+                                   Serve Meals
                                 </NavLink>
                             </li>
 
