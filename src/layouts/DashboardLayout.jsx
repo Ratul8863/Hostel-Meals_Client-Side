@@ -144,13 +144,13 @@ const DashboardLayout = () => {
                                     All Reviews 
                                 </NavLink>
                             </li>
-                          
-                            {/* <li>
+                            {/* Example of another admin link */}
+                            <li>
                                 <NavLink to="/dashboard/admin-stats" className={sidebarNavLinkClasses}>
                                     <FaChartLine className="inline-block mr-3 text-xl" />
                                     Admin Statistics
                                 </NavLink>
-                            </li> */}
+                            </li>
                         </>
                     )}
 
