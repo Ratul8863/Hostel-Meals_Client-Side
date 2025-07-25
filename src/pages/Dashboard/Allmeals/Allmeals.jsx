@@ -4,11 +4,14 @@ import Swal from 'sweetalert2';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import { Link } from 'react-router';
 
+const ITEMS_PER_PAGE = 10;
+
 const AllMeals = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
   const [sortBy, setSortBy] = useState('');
-  const [editingMeal, setEditingMeal] = useState(null); // meal being edited
+  const [editingMeal, setEditingMeal] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: meals = [], isLoading } = useQuery({
     queryKey: ['meals', sortBy],
@@ -72,6 +75,13 @@ const AllMeals = () => {
     updateMealMutation.mutate({ id: editingMeal._id, data: updatedData });
   };
 
+  // Pagination logic
+  const totalPages = Math.ceil(meals.length / ITEMS_PER_PAGE);
+  const paginatedMeals = meals.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <h2 className="text-3xl font-bold mb-4">All Meals</h2>
@@ -89,47 +99,74 @@ const AllMeals = () => {
         </select>
       </div>
 
-      {
-        isLoading ? <p>Loading meals...</p> :
-          <div className="overflow-x-auto">
-            <table className="table table-zebra w-full">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Title</th>
-                  <th>Likes</th>
-                  <th>Reviews</th>
-                  <th>Rating</th>
-                  <th>Distributor</th>
-                  <th>Actions</th>
+      {isLoading ? (
+        <p>Loading meals...</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="table table-zebra w-full">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Likes</th>
+                <th>Reviews</th>
+                <th>Rating</th>
+                <th>Distributor</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedMeals.map((meal, index) => (
+                <tr key={meal._id}>
+                  <td>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
+                  <td>{meal.title}</td>
+                  <td>{meal.likes}</td>
+                  <td>{meal.reviews_count}</td>
+                  <td>{meal.rating}</td>
+                  <td>{meal.distributorName || 'N/A'}</td>
+                  <td className="flex gap-2 flex-wrap">
+                    <Link to={`/meal/${meal._id}`} className="btn btn-sm btn-info">View</Link>
+                    <button onClick={() => setEditingMeal(meal)} className="btn btn-sm btn-warning">Edit</button>
+                    <button onClick={() => handleDelete(meal._id)} className="btn btn-sm btn-error">Delete</button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {
-                  meals.map((meal, index) => (
-                    <tr key={meal._id}>
-                      <td>{index + 1}</td>
-                      <td>{meal.title}</td>
-                      <td>{meal.likes}</td>
-                      <td>{meal.reviews_count}</td>
-                      <td>{meal.rating}</td>
-                      <td>{meal.distributorName || 'N/A'}</td>
-                      <td className="flex gap-2 flex-wrap">
-                        <Link to={`/meal/${meal._id}`} className="btn btn-sm btn-info">View</Link>
-                        <button onClick={() => setEditingMeal(meal)} className="btn btn-sm btn-warning">Edit</button>
-                        <button onClick={() => handleDelete(meal._id)} className="btn btn-sm btn-error">Delete</button>
-                      </td>
-                    </tr>
-                  ))
-                }
-              </tbody>
-            </table>
-          </div>
-      }
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="mt-6 flex justify-center gap-2">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            className="btn btn-sm"
+            disabled={currentPage === 1}
+          >
+            Prev
+          </button>
+          {[...Array(totalPages)].map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentPage(idx + 1)}
+              className={`btn btn-sm ${currentPage === idx + 1 ? 'btn-primary' : ''}`}
+            >
+              {idx + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            className="btn btn-sm"
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* Modal */}
-      {
-        editingMeal &&
+      {editingMeal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded shadow-md w-full max-w-md relative">
             <h3 className="text-xl font-semibold mb-4">Edit Meal</h3>
@@ -144,7 +181,7 @@ const AllMeals = () => {
             </form>
           </div>
         </div>
-      }
+      )}
     </div>
   );
 };

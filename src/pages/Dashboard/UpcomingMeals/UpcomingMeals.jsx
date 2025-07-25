@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
@@ -7,6 +7,7 @@ import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import useAuth from '../../../hooks/useAuth';
 
 const MySwal = withReactContent(Swal);
+const ITEMS_PER_PAGE = 10;
 
 const UpcomingMeals = () => {
   const { user } = useAuth();
@@ -14,6 +15,7 @@ const UpcomingMeals = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [adding, setAdding] = useState(false);
   const [publishingId, setPublishingId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
@@ -25,6 +27,11 @@ const UpcomingMeals = () => {
       return res.data;
     }
   });
+
+  // Reset page to 1 if upcomingMeals changes (optional)
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [upcomingMeals]);
 
   // Add a new upcoming meal
   const onSubmit = async (data) => {
@@ -49,7 +56,7 @@ const UpcomingMeals = () => {
         ingredients: data.ingredients,
         description: data.description,
         price,
-         likes: 0,
+        likes: 0,
         image: imageUrl,
         addedBy: user?.email,
         distributorName: user?.displayName,
@@ -71,23 +78,34 @@ const UpcomingMeals = () => {
   };
 
   // Publish meal to main collection
- const handlePublish = async (meal) => {
-  setPublishingId(meal._id);
-  try {
-    const res = await axiosSecure.post('/publish-meal', meal);
-    if (res.data.insertedId) {
-      // ✅ Delete from upcoming-meals after successful publish
-      await axiosSecure.delete(`/upcoming-meals/${meal._id}`);
-      Swal.fire('Published!', 'Meal published to All Meals', 'success');
-      refetch();
+  const handlePublish = async (meal) => {
+    setPublishingId(meal._id);
+    try {
+      const res = await axiosSecure.post('/publish-meal', meal);
+      if (res.data.insertedId) {
+        // Delete from upcoming-meals after successful publish
+        await axiosSecure.delete(`/upcoming-meals/${meal._id}`);
+        Swal.fire('Published!', 'Meal published to All Meals', 'success');
+        refetch();
+      }
+    } catch (err) {
+      Swal.fire('Error', err.message || 'Failed to publish meal', 'error');
+    } finally {
+      setPublishingId(null);
     }
-  } catch (err) {
-    Swal.fire('Error', err.message || 'Failed to publish meal', 'error');
-  } finally {
-    setPublishingId(null);
-  }
-};
+  };
 
+  // Pagination logic
+  const totalPages = Math.ceil(upcomingMeals.length / ITEMS_PER_PAGE);
+  const paginatedMeals = upcomingMeals.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
 
   return (
     <div className="p-6">
@@ -113,27 +131,64 @@ const UpcomingMeals = () => {
             </tr>
           </thead>
           <tbody>
-            {upcomingMeals.map((meal, index) => (
-              <tr key={meal._id}>
-                <td>{index + 1}</td>
-                <td><img src={meal.image} className="w-16 h-16 rounded" alt={meal.title} /></td>
-                <td>{meal.title}</td>
-                <td>{meal.category}</td>
-                <td>{meal.likes}</td>
-                <td>{meal.addedBy}</td>
-                <td>
-                  <button
-                    onClick={() => handlePublish(meal)}
-                    className="btn btn-primary btn-sm"
-                    disabled={publishingId === meal._id}
-                  >
-                    {publishingId === meal._id ? 'Publishing...' : 'Publish'}
-                  </button>
+            {paginatedMeals.length > 0 ? (
+              paginatedMeals.map((meal, index) => (
+                <tr key={meal._id}>
+                  <td>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
+                  <td><img src={meal.image} className="w-16 h-16 rounded" alt={meal.title} /></td>
+                  <td>{meal.title}</td>
+                  <td>{meal.category}</td>
+                  <td>{meal.likes}</td>
+                  <td>{meal.addedBy}</td>
+                  <td>
+                    <button
+                      onClick={() => handlePublish(meal)}
+                      className="btn btn-primary btn-sm"
+                      disabled={publishingId === meal._id}
+                    >
+                      {publishingId === meal._id ? 'Publishing...' : 'Publish'}
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7} className="text-center py-4">
+                  No upcoming meals found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
+
+        {/* Pagination Footer */}
+        <div className="flex justify-center mt-4 gap-2">
+                        <button
+                            className="btn btn-sm"
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage((prev) => prev - 1)}
+                        >
+                            Previous
+                        </button>
+
+                        {[...Array(totalPages)].map((_, i) => (
+                            <button
+                                key={i}
+                                className={`btn btn-sm ${currentPage === i + 1 ? "btn-active" : ""}`}
+                                onClick={() => setCurrentPage(i + 1)}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+
+                        <button
+                            className="btn btn-sm"
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage((prev) => prev + 1)}
+                        >
+                            Next
+                        </button>
+                    </div>
       </div>
 
       {/* Modal */}
