@@ -1,23 +1,38 @@
 import React from 'react';
-import { Outlet } from 'react-router';
-import authImg from '../assets/authImage.png'
-import ProFastLogo from '../pages/shared/ProFastLogo/ProFastLogo';
+import { Outlet, Link } from 'react-router-dom'; // Changed to react-router-dom for consistency
+import login from "../assets/Lottie/Login.json" // Assuming this path is correct for your image asset
+import ProFastLogo from '../pages/shared/ProFastLogo/ProFastLogo'; // Assuming correct path to your logo component
+import Lottie from 'lottie-react';
 
 const AuthLayout = () => {
     return (
-        <div className="p-12 bg-base-200">
-            <div>
-                <ProFastLogo></ProFastLogo>
+        // Main container for the authentication layout
+        // Ensures full viewport height, centers content, and applies a subtle gradient background
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-16 px-4 font-inter">
+            
+            {/* Logo positioned at the top-left, visible across the layout */}
+            <div className="absolute top-0 left-0 p-8 z-10 w-full max-w-7xl mx-auto">
+                <Link to="/"> {/* Link logo back to home page */}
+                    <ProFastLogo className="text-gray-800 h-10" /> {/* Ensure ProFastLogo accepts className for styling */}
+                </Link>
             </div>
-            <div className="hero-content flex-col lg:flex-row-reverse">
-                <div className='flex-1'>
-                    <img
-                        src={authImg}
-                        className="max-w-sm rounded-lg shadow-2xl"
-                    />
+
+            {/* Hero content section, responsive layout for image and form */}
+            <div className="flex flex-col lg:flex-row-reverse items-center justify-center w-full max-w-6xl mx-auto gap-12">
+                
+                {/* Image section - hidden on small screens, displayed on large screens */}
+                <div className="flex-1 hidden lg:flex justify-center items-center p-4">
+                    <Lottie
+  animationData={login}
+  loop={true}
+  autoplay={true}
+//   style={{ width: 300, height: 300 }}
+/>
                 </div>
-                <div className='flex-1'>
-                    <Outlet></Outlet>
+
+                {/* Outlet for nested routes (Login, Register forms) */}
+                <div className="flex-1 w-full">
+                    <Outlet />
                 </div>
             </div>
         </div>
