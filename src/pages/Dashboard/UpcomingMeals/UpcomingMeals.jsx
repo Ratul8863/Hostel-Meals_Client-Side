@@ -2,100 +2,47 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'; // Added useMutation, useQueryClient
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import useAuth from '../../../hooks/useAuth';
+import { FaPlus, FaImage, FaUtensils, FaDollarSign, FaListAlt, FaPencilAlt, FaUser, FaEnvelope, FaHeart, FaCalendarAlt, FaCheckCircle, FaTimes } from 'react-icons/fa'; // Added more icons
 
 const MySwal = withReactContent(Swal);
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 8; // Consistent items per page
 
 const UpcomingMeals = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient(); // Initialize queryClient
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [adding, setAdding] = useState(false);
-  const [publishingId, setPublishingId] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [imagePreview, setImagePreview] = useState(null); // State for image preview
+  const [publishingId, setPublishingId] = useState(null); // State for tracking publishing meal
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm();
 
-  // Load upcoming meals
-  const { data: upcomingMeals = [], refetch } = useQuery({
-    queryKey: ['upcoming-meals'],
+  // Watch image field to show preview in the modal
+  const imageFile = watch("image");
+  useEffect(() => {
+    if (imageFile && imageFile.length > 0) {
+      const file = imageFile[0];
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      setImagePreview(null);
+    }
+  }, [imageFile]);
+
+  // Fetch upcoming meals
+  const { data: upcomingMeals = [], isLoading, isError, error, refetch } = useQuery({
+    queryKey: ['upcoming-meals-admin'], // Distinct query key for admin view
     queryFn: async () => {
+      // Assuming backend sorts by likes by default or we can add a sort param if needed
       const res = await axiosSecure.get('/upcoming-meals?sortBy=likes');
       return res.data;
-    }
+    },
   });
 
-  // Reset page to 1 if upcomingMeals changes (optional)
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [upcomingMeals]);
-
-  // Add a new upcoming meal
-  const onSubmit = async (data) => {
-    setAdding(true);
-    try {
-      const img_hosting_key = import.meta.env.VITE_image_upload_key;
-      const img_hosting_url = `https://api.imgbb.com/1/upload?key=${img_hosting_key}`;
-
-      // Upload image
-      const formData = new FormData();
-      formData.append('image', data.image[0]);
-      const imgRes = await fetch(img_hosting_url, { method: 'POST', body: formData });
-      const imgData = await imgRes.json();
-      if (!imgData.success) throw new Error('Image upload failed');
-      const imageUrl = imgData.data.display_url;
-
-      const price = parseInt(data.price);
-
-      const meal = {
-        title: data.title,
-        category: data.category,
-        ingredients: data.ingredients,
-        description: data.description,
-        price,
-        likes: 0,
-        image: imageUrl,
-        addedBy: user?.email,
-        distributorName: user?.displayName,
-        postTime: new Date().toISOString(),
-      };
-
-      const res = await axiosSecure.post('/upcoming-meals', meal);
-      if (res.data.insertedId) {
-        Swal.fire('Success', 'Meal added to upcoming meals', 'success');
-        setIsModalOpen(false);
-        reset();
-        refetch();
-      }
-    } catch (err) {
-      Swal.fire('Error', err.message || 'Failed to add meal', 'error');
-    } finally {
-      setAdding(false);
-    }
-  };
-
-  // Publish meal to main collection
-  const handlePublish = async (meal) => {
-    setPublishingId(meal._id);
-    try {
-      const res = await axiosSecure.post('/publish-meal', meal);
-      if (res.data.insertedId) {
-        // Delete from upcoming-meals after successful publish
-        await axiosSecure.delete(`/upcoming-meals/${meal._id}`);
-        Swal.fire('Published!', 'Meal published to All Meals', 'success');
-        refetch();
-      }
-    } catch (err) {
-      Swal.fire('Error', err.message || 'Failed to publish meal', 'error');
-    } finally {
-      setPublishingId(null);
-    }
-  };
-
   // Pagination logic
+  const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(upcomingMeals.length / ITEMS_PER_PAGE);
   const paginatedMeals = upcomingMeals.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -103,121 +50,419 @@ const UpcomingMeals = () => {
   );
 
   const goToPage = (page) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
+  // Mutation for adding a new upcoming meal
+  const addUpcomingMealMutation = useMutation({
+    mutationFn: async (mealData) => {
+      const img_hosting_key = import.meta.env.VITE_image_upload_key;
+      const img_hosting_url = `https://api.imgbb.com/1/upload?key=${img_hosting_key}`;
+
+      // Upload image
+      const formData = new FormData();
+      formData.append('image', mealData.image[0]);
+      const imgRes = await fetch(img_hosting_url, { method: 'POST', body: formData });
+      const imgData = await imgRes.json();
+      if (!imgData.success) throw new Error(imgData.error?.message || "Image upload failed");
+      const imageUrl = imgData.data.display_url;
+
+      const price = parseFloat(mealData.price);
+      if (isNaN(price)) throw new Error("Invalid price value.");
+
+      const newMeal = {
+        title: mealData.title,
+        category: mealData.category,
+        ingredients: mealData.ingredients,
+        description: mealData.description,
+        price: price,
+        likes: 0, // Initial likes for upcoming meals
+        image: imageUrl,
+        addedBy: user?.email,
+        distributorName: user?.displayName,
+        postTime: new Date().toISOString(),
+      };
+
+      const res = await axiosSecure.post('/upcoming-meals', newMeal);
+      return res.data;
+    },
+    onSuccess: () => {
+      MySwal.fire({
+        icon: 'success',
+        title: 'Added!',
+        text: 'Meal added to upcoming meals successfully.',
+        customClass: {
+          confirmButton: 'bg-primary-dark text-white px-6 py-2 rounded-lg hover:bg-primary-light transition-colors duration-200',
+        },
+        buttonsStyling: false,
+      });
+      setIsModalOpen(false); // Close modal
+      reset(); // Reset form
+      setImagePreview(null); // Clear image preview
+      queryClient.invalidateQueries(['upcoming-meals-admin']); // Refetch upcoming meals
+    },
+    onError: (mutationError) => {
+      console.error("Error adding upcoming meal:", mutationError);
+      MySwal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: mutationError.message || 'Failed to add meal to upcoming. Please try again.',
+        customClass: {
+          confirmButton: 'bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200',
+        },
+        buttonsStyling: false,
+      });
+    },
+  });
+
+  // Mutation for publishing a meal to main collection
+  const publishMealMutation = useMutation({
+    mutationFn: async (mealToPublish) => {
+      // Step 1: Add to main meals collection
+      const mainMealData = {
+        ...mealToPublish,
+        rating: 0, // Initial rating for published meal
+        reviews_count: 0, // Initial reviews count for published meal
+        postTime: new Date().toISOString(), // Use current time for publishing
+      };
+      delete mainMealData._id; // Remove _id as it will be new in meals collection
+
+      const publishRes = await axiosSecure.post('/meals', mainMealData);
+      if (!publishRes.data.insertedId) {
+        throw new Error("Failed to add meal to main collection.");
+      }
+
+      // Step 2: Delete from upcoming meals
+      const deleteRes = await axiosSecure.delete(`/upcoming-meals/${mealToPublish._id}`);
+      if (deleteRes.status !== 200) { // Check status for successful deletion
+        throw new Error("Failed to remove meal from upcoming meals after publishing.");
+      }
+      return publishRes.data; // Return data from successful publish
+    },
+    onSuccess: () => {
+      MySwal.fire({
+        icon: 'success',
+        title: 'Published!',
+        text: 'Meal published to All Meals successfully and removed from upcoming.',
+        customClass: {
+          confirmButton: 'bg-primary-dark text-white px-6 py-2 rounded-lg hover:bg-primary-light transition-colors duration-200',
+        },
+        buttonsStyling: false,
+      });
+      queryClient.invalidateQueries(['upcoming-meals-admin']); // Refetch upcoming meals
+      queryClient.invalidateQueries(['adminMeals']); // Invalidate All Meals to show new meal
+    },
+    onError: (mutationError) => {
+      console.error("Error publishing meal:", mutationError);
+      MySwal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: mutationError.message || 'Failed to publish meal. Please try again.',
+        customClass: {
+          confirmButton: 'bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200',
+        },
+        buttonsStyling: false,
+      });
+    },
+    onSettled: () => {
+      setPublishingId(null); // Clear publishing state regardless of success/failure
+    }
+  });
+
+
+  const handleAddMealSubmit = (data) => {
+    addUpcomingMealMutation.mutate(data);
+  };
+
+  const handlePublishClick = (meal) => {
+    MySwal.fire({
+      title: `Publish "${meal.title}"?`,
+      text: "This meal will be moved to 'All Meals' and removed from 'Upcoming Meals'.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Publish!",
+      cancelButtonText: "Cancel",
+      customClass: {
+        confirmButton: 'bg-primary-dark text-white px-6 py-2 rounded-lg hover:bg-primary-light transition-colors duration-200',
+        cancelButton: 'bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200',
+      },
+      buttonsStyling: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        publishMealMutation.mutate(meal);
+      }
+    });
+  };
+
+  // Loading, Error, and Empty States
+  if (isLoading) {
+    return <p className="text-center text-gray-600 text-xl py-10">Loading upcoming meals...</p>;
+  }
+  if (isError) {
+    return <p className="text-center text-red-600 text-xl py-10">Error loading upcoming meals: {error.message}</p>;
+  }
+
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold">🍽️ Upcoming Meals</h2>
-        <button onClick={() => setIsModalOpen(true)} className="btn btn-success">
-          ➕ Add Upcoming Meal
+    <div className="py-16 max-w-7xl mx-auto px-4"> {/* Consistent padding and max-width */}
+      <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800">
+        Manage Upcoming Meals
+      </h2>
+      <p className="text-center text-lg md:text-xl text-gray-600 mb-16 max-w-3xl mx-auto">
+        Oversee meals planned for future publication. Publish them to make them available to all users.
+      </p>
+
+      <div className="flex justify-end items-center mb-8"> {/* Aligned to right */}
+        <button
+          onClick={() => { setIsModalOpen(true); reset(); setImagePreview(null); }} // Reset form and preview on open
+          className="inline-flex items-center px-6 py-3 bg-primary-dark text-white font-semibold rounded-lg hover:bg-primary-light transition-colors duration-200 text-base shadow-md"
+        >
+          <FaPlus className="mr-2" /> Add Upcoming Meal
         </button>
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="table w-full">
-          <thead className="bg-base-200">
-            <tr>
-              <th>#</th>
-              <th>Image</th>
-              <th>Title</th>
-              <th>Category</th>
-              <th>Likes</th>
-              <th>Added By</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedMeals.length > 0 ? (
-              paginatedMeals.map((meal, index) => (
-                <tr key={meal._id}>
-                  <td>{(currentPage - 1) * ITEMS_PER_PAGE + index + 1}</td>
-                  <td><img src={meal.image} className="w-16 h-16 rounded" alt={meal.title} /></td>
-                  <td>{meal.title}</td>
-                  <td>{meal.category}</td>
-                  <td>{meal.likes}</td>
-                  <td>{meal.addedBy}</td>
-                  <td>
-                    <button
-                      onClick={() => handlePublish(meal)}
-                      className="btn btn-primary btn-sm"
-                      disabled={publishingId === meal._id}
-                    >
-                      {publishingId === meal._id ? 'Publishing...' : 'Publish'}
-                    </button>
-                  </td>
+      {upcomingMeals.length === 0 ? (
+        <p className="text-center text-gray-600 text-xl py-10">No upcoming meals to display at the moment.</p>
+      ) : (
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 p-6 md:p-8"> {/* Polished card container for the table */}
+          <div className="overflow-x-auto"> {/* Ensures table is scrollable on small screens */}
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">
+                    #
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Image
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span className="flex items-center gap-2"><FaUtensils /> Title</span>
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span className="flex items-center gap-2"><FaListAlt /> Category</span>
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span className="flex items-center gap-2"><FaHeart /> Likes</span>
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span className="flex items-center gap-2"><FaUser /> Added By</span>
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">
+                    Action
+                  </th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={7} className="text-center py-4">
-                  No upcoming meals found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {paginatedMeals.map((meal, index) => (
+                  <tr key={meal._id} className="hover:bg-gray-50 transition-colors duration-150">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <img src={meal.image || 'https://placehold.co/64x64?text=Meal'} className="w-16 h-16 object-cover rounded-lg border border-gray-200" alt={meal.title} />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                      {meal.title}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize">
+                      {meal.category}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      {meal.likes || 0}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      {meal.distributorName || meal.addedBy || 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button
+                        onClick={() => handlePublishClick(meal)}
+                        className="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-primary-dark text-white hover:bg-primary-light"
+                        disabled={publishingId === meal._id || publishMealMutation.isPending} // Disable button while publishing
+                      >
+                        {publishingId === meal._id ? 'Publishing...' : <><FaCheckCircle className="mr-2" /> Publish</>}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-        {/* Pagination Footer */}
-        <div className="flex justify-center mt-4 gap-2">
-                        <button
-                            className="btn btn-sm"
-                            disabled={currentPage === 1}
-                            onClick={() => setCurrentPage((prev) => prev - 1)}
-                        >
-                            Previous
-                        </button>
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center mt-8 space-x-2">
+              <button
+                className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={currentPage === 1}
+                onClick={() => goToPage(currentPage - 1)}
+              >
+                Previous
+              </button>
 
-                        {[...Array(totalPages)].map((_, i) => (
-                            <button
-                                key={i}
-                                className={`btn btn-sm ${currentPage === i + 1 ? "btn-active" : ""}`}
-                                onClick={() => setCurrentPage(i + 1)}
-                            >
-                                {i + 1}
-                            </button>
-                        ))}
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200
+                    ${currentPage === i + 1
+                      ? "bg-gray-800 text-white shadow-md"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  onClick={() => goToPage(i + 1)}
+                >
+                  {i + 1}
+                </button>
+              ))}
 
-                        <button
-                            className="btn btn-sm"
-                            disabled={currentPage === totalPages}
-                            onClick={() => setCurrentPage((prev) => prev + 1)}
-                        >
-                            Next
-                        </button>
-                    </div>
-      </div>
+              <button
+                className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={currentPage === totalPages}
+                onClick={() => goToPage(currentPage + 1)}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
-      {/* Modal */}
+      {/* Add Upcoming Meal Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl w-full max-w-xl relative">
-            <h3 className="text-xl font-bold mb-4">➕ Add Upcoming Meal</h3>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <input {...register('title', { required: true })} placeholder="Title" className="input input-bordered w-full" />
-              <input
-                type="number"
-                className="input input-bordered w-full"
-                placeholder="Price"
-                step="1"
-                {...register("price", { required: true })}
-              />
-              <select {...register('category', { required: true })} className="select select-bordered w-full">
-                <option value="">Select Category</option>
-                <option value="Breakfast">Breakfast</option>
-                <option value="Lunch">Lunch</option>
-                <option value="Dinner">Dinner</option>
-              </select>
-              <textarea {...register('description', { required: true })} placeholder="Description" className="textarea textarea-bordered w-full" />
-              <textarea {...register('ingredients', { required: true })} placeholder="Ingredients (comma separated)" className="textarea textarea-bordered w-full" />
-              <input type="file" {...register('image', { required: true })} className="file-input file-input-bordered w-full" />
-              <div className="flex justify-end gap-2">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-outline">Cancel</button>
-                <button type="submit" className="btn btn-success" disabled={adding}>
-                  {adding ? 'Adding...' : 'Add Meal'}
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg relative transform transition-all duration-300 scale-100 opacity-100">
+            <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Add New Upcoming Meal</h3>
+
+            {/* Close Button */}
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors duration-200"
+              title="Close"
+            >
+              <FaTimes className="text-2xl" />
+            </button>
+
+            <form onSubmit={handleSubmit(handleAddMealSubmit)} className="space-y-6">
+              {/* Title */}
+              <div>
+                <label htmlFor="modal-title" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+                  <FaUtensils /> Meal Title
+                </label>
+                <input
+                  id="modal-title"
+                  type="text"
+                  placeholder="e.g., Spicy Lentil Soup"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200"
+                  {...register("title", { required: "Meal title is required" })}
+                />
+                {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+              </div>
+
+              {/* Category */}
+              <div>
+                <label htmlFor="modal-category" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+                  <FaListAlt /> Category
+                </label>
+                <select
+                  id="modal-category"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-light appearance-none transition-colors duration-200"
+                  {...register("category", { required: "Category is required" })}
+                >
+                  <option value="">Select Category</option>
+                  <option value="Breakfast">Breakfast</option>
+                  <option value="Lunch">Lunch</option>
+                  <option value="Dinner">Dinner</option>
+                  <option value="Snacks">Snacks</option>
+                  <option value="Desserts">Desserts</option>
+                </select>
+                {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
+              </div>
+
+              {/* Price */}
+              <div>
+                <label htmlFor="modal-price" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+                  <FaDollarSign /> Price ($)
+                </label>
+                <input
+                  id="modal-price"
+                  type="number"
+                  placeholder="e.g., 8.50"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200"
+                  step="0.01"
+                  {...register("price", {
+                    required: "Price is required",
+                    min: { value: 0, message: "Price cannot be negative" },
+                    pattern: { value: /^\d+(\.\d{1,2})?$/, message: "Invalid price format" }
+                  })}
+                />
+                {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
+              </div>
+
+              {/* Ingredients */}
+              <div>
+                <label htmlFor="modal-ingredients" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+                  <FaPencilAlt /> Ingredients (comma-separated)
+                </label>
+                <textarea
+                  id="modal-ingredients"
+                  placeholder="e.g., Lentils, Carrots, Spinach, Garlic"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200 resize-y"
+                  rows={3}
+                  {...register("ingredients", { required: "Ingredients are required" })}
+                ></textarea>
+                {errors.ingredients && <p className="text-red-500 text-sm mt-1">{errors.ingredients.message}</p>}
+              </div>
+
+              {/* Description */}
+              <div>
+                <label htmlFor="modal-description" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+                  <FaPencilAlt /> Description
+                </label>
+                <textarea
+                  id="modal-description"
+                  placeholder="A hearty and nutritious soup..."
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200 resize-y"
+                  rows={4}
+                  {...register("description", { required: "Description is required" })}
+                ></textarea>
+                {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
+              </div>
+
+              {/* Image Upload */}
+              <div>
+                <label htmlFor="modal-image" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+                  <FaImage /> Meal Image
+                </label>
+                <input
+                  id="modal-image"
+                  type="file"
+                  accept="image/*"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-white hover:file:bg-primary-dark transition-colors duration-200 cursor-pointer"
+                  {...register("image", { required: "Meal image is required" })}
+                />
+                {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>}
+                {imagePreview && (
+                  <div className="mt-4 flex justify-center">
+                    <img src={imagePreview} alt="Meal Preview" className="max-h-48 rounded-lg shadow-md border border-gray-200 object-cover" />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-6 py-3 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className={`px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-900 transition-colors duration-200
+                    ${addUpcomingMealMutation.isPending ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  disabled={addUpcomingMealMutation.isPending}
+                >
+                  {addUpcomingMealMutation.isPending ? 'Adding Meal...' : 'Add Meal'}
                 </button>
               </div>
             </form>

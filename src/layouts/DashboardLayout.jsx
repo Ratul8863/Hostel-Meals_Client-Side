@@ -1,27 +1,43 @@
 import React from 'react';
-import { NavLink, Outlet } from 'react-router';
-import ProFastLogo from '../pages/shared/ProFastLogo/ProFastLogo';
-import { FaHome, FaBoxOpen, FaMoneyCheckAlt, FaUserEdit, FaSearchLocation, FaUserCheck, FaUserClock, FaUserShield, FaMotorcycle, FaTasks, FaCheckCircle, FaWallet, FaUtensils } from 'react-icons/fa';
-import useUserRole from '../hooks/useUserRole';
+import { NavLink, Outlet } from 'react-router-dom'; // Changed to react-router-dom for consistency
+import ProFastLogo from '../pages/shared/ProFastLogo/ProFastLogo'; // Assuming correct path to your logo
+import { FaHome, FaBoxOpen, FaMoneyCheckAlt, FaUserEdit, FaSearchLocation, FaUserCheck, FaUserClock, FaUserShield, FaTasks, FaWallet, FaUtensils, FaClipboardList, FaFileInvoiceDollar, FaChartLine, FaMotorcycle, FaCheckCircle } from 'react-icons/fa'; // More specific icons for dashboard items
+import useUserRole from '../hooks/useUserRole'; // Your custom hook for user role
 
 const DashboardLayout = () => {
-
     const { role, roleLoading } = useUserRole();
-    
+
+    // Base classes for NavLink items in the sidebar
+    const sidebarNavLinkClasses = ({ isActive }) =>
+        `flex items-center px-4 py-3 rounded-lg text-lg transition-colors duration-200 mb-2
+        ${isActive
+            ? 'bg-primary-dark text-white font-semibold shadow-md' // Active state: dark primary background, white text
+            : 'text-gray-300 hover:bg-gray-700 hover:text-white' // Inactive state: lighter text, subtle hover
+        }`;
+
+    if (roleLoading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen bg-gray-50">
+                <p className="text-xl text-gray-700">Loading dashboard...</p>
+            </div>
+        );
+    }
+
     return (
         <div className="drawer lg:drawer-open">
             <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
-            <div className="drawer-content flex flex-col">
 
-                {/* Navbar */}
-                <div className="navbar bg-base-300 w-full lg:hidden">
-                    <div className="flex-none ">
-                        <label htmlFor="my-drawer-2" aria-label="open sidebar" className="btn btn-square btn-ghost">
+            {/* Main Content Area */}
+            <div className="drawer-content flex flex-col bg-gray-100 min-h-screen"> {/* Light background for content */}
+                {/* Mobile Navbar */}
+                <div className="navbar bg-white shadow-sm border-b border-gray-100 w-full lg:hidden px-4 py-3"> {/* Matches main Navbar style */}
+                    <div className="flex-none">
+                        <label htmlFor="my-drawer-2" aria-label="open sidebar" className="btn btn-ghost p-2">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
-                                className="inline-block h-6 w-6 stroke-current"
+                                className="inline-block h-6 w-6 stroke-current text-gray-700"
                             >
                                 <path
                                     strokeLinecap="round"
@@ -32,174 +48,121 @@ const DashboardLayout = () => {
                             </svg>
                         </label>
                     </div>
-                    <div className="mx-2 flex-1 px-2 lg:hidden">Dashboard</div>
-
+                    <div className="flex-1 px-2 text-xl font-semibold text-gray-800">Dashboard</div>
                 </div>
-                {/* Page content here */}
-                <Outlet></Outlet>
-                {/* Page content here */}
 
+                {/* Page content from Outlet */}
+                <div className="p-6 md:p-8 lg:p-10 flex-grow"> {/* Consistent padding for content */}
+                    <Outlet />
+                </div>
             </div>
+
+            {/* Sidebar */}
             <div className="drawer-side">
                 <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
-                <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
-                    {/* Sidebar content here */}
-                    <ProFastLogo></ProFastLogo>
-                    <li>
-                        <NavLink to="/dashboard">
-                            <FaHome className="inline-block mr-2" />
-                            Dashboard
-                        </NavLink>
+                <ul className="menu bg-gray-800 text-white min-h-full w-80 p-6 flex flex-col"> {/* Dark sidebar, increased padding */}
+                    {/* Logo Section */}
+                    <li className="mb-8 mt-4 px-4">
+                        <ProFastLogo className="text-white h-10" /> {/* Ensure ProFastLogo accepts className for styling */}
                     </li>
 
-                      <li>
-                        <NavLink to="/">
-                            <FaHome className="inline-block mr-2" />
-                            Home
+                    {/* Common Dashboard Links */}
+                    <li>
+                        <NavLink to="/dashboard" className={sidebarNavLinkClasses}>
+                            <FaHome className="inline-block mr-3 text-xl" />
+                            Dashboard Home
                         </NavLink>
                     </li>
-                  
                     <li>
-                        <NavLink to="/dashboard/paymentHistory">
-                            <FaMoneyCheckAlt className="inline-block mr-2" />
+                        <NavLink to="/dashboard/profile" className={sidebarNavLinkClasses}>
+                            <FaUserEdit className="inline-block mr-3 text-xl" />
+                            My Profile
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/dashboard/paymentHistory" className={sidebarNavLinkClasses}>
+                            <FaFileInvoiceDollar className="inline-block mr-3 text-xl" /> {/* More specific icon */}
                             Payment History
                         </NavLink>
                     </li>
-                    
-                    <li>
-                        <NavLink to="/dashboard/profile">
-                            <FaUserEdit className="inline-block mr-2" />
-                             Profile
-                        </NavLink>
-                    </li>
 
-                     
-
-
-
- {!roleLoading && role === 'user' && <>
-  <li>
-                            <NavLink to="/dashboard/my-meal-request">
-                                <FaWallet className="inline-block mr-2" />
-                                My Requested Meals
-                            </NavLink>
-                        </li>
-
-
- <li>
-                            <NavLink to="/dashboard/my-meal-reviews">
-                                <FaWallet className="inline-block mr-2" />
-                                My Reviews
-                            </NavLink>
-                        </li>
-
- </>
-
-}
-
-
-
-
-
-
-
-                    {/* rider links */}
-                    {!roleLoading && role === 'rider' && <>
-                        <li>
-                            <NavLink to="/dashboard/pending-deliveries">
-                                <FaTasks className="inline-block mr-2" />
-                                Pending Deliveries
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink to="/dashboard/completed-deliveries">
-                                <FaCheckCircle className="inline-block mr-2" />
-                                Completed Deliveries
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink to="/dashboard/my-earnings">
-                                <FaWallet className="inline-block mr-2" />
-                                My Earnings
-                            </NavLink>
-                        </li>
-                      
-
-
-                    </>}
-
-
-                    {/* admin link */}
-                    {!roleLoading && role === 'admin' &&
+                    {/* User Specific Links */}
+                    {!roleLoading && role === 'user' && (
                         <>
-                         {/* <li>
-                                <NavLink to="/dashboard/assign-rider">
-                                    <FaMotorcycle className="inline-block mr-2" />
-                                    Profile
-                                </NavLink>
-                            </li> */}
-                            {/* <li>
-                                <NavLink to="/dashboard/assign-rider">
-                                    <FaMotorcycle className="inline-block mr-2" />
-                                    Assign Rider
-                                </NavLink>
-                            </li> */}
-                            {/* <li>
-                                <NavLink to="/dashboard/active-riders">
-                                    <FaUserCheck className="inline-block mr-2" />
-                                    Active Riders
-                                </NavLink>
-                            </li> */}
-{/*         
                             <li>
-                                <NavLink to="/dashboard/pending-riders">
-                                    <FaUserClock className="inline-block mr-2" />
-                                    Pending Riders
+                                <NavLink to="/dashboard/my-meal-request" className={sidebarNavLinkClasses}>
+                                    <FaClipboardList className="inline-block mr-3 text-xl" /> {/* More specific icon */}
+                                    My Requested Meals
                                 </NavLink>
-                            </li> */}
+                            </li>
                             <li>
-                                <NavLink to="/dashboard/makeAdmin">
-                                    <FaUserShield className="inline-block mr-2" />
+                                <NavLink to="/dashboard/my-meal-reviews" className={sidebarNavLinkClasses}>
+                                    <FaTasks className="inline-block mr-3 text-xl" /> {/* More specific icon */}
+                                    My Reviews
+                                </NavLink>
+                            </li>
+                        </>
+                    )}
+
+                    {/* Admin Specific Links */}
+                    {!roleLoading && role === 'admin' && (
+                        <>
+                            <li>
+                                <NavLink to="/dashboard/makeAdmin" className={sidebarNavLinkClasses}> {/* Renamed route for clarity */}
+                                    <FaUserShield className="inline-block mr-3 text-xl" />
                                     Manage Users
                                 </NavLink>
                             </li>
-
                             <li>
-  <NavLink to="/dashboard/add-meal">
-    <FaUtensils className="inline-block mr-2" />
-    Add Meal
-  </NavLink>
-
-  <NavLink to="/dashboard/all-meals">
-    <FaUtensils className="inline-block mr-2" />
-    All meals
-  </NavLink>
-</li>
-
- <li>
-                                <NavLink to="/dashboard/pending-meals">
-                                    <FaUserClock className="inline-block mr-2" />
-                                   Serve Meals
+                                <NavLink to="/dashboard/add-meal" className={sidebarNavLinkClasses}>
+                                    <FaUtensils className="inline-block mr-3 text-xl" />
+                                    Add Meal
                                 </NavLink>
                             </li>
-
-
-
- <li>
-                                <NavLink to="/dashboard/upcoming-meals">
-                                    <FaUserClock className="inline-block mr-2" />
-                                   Upcoming Meals
+                            <li>
+                                <NavLink to="/dashboard/all-meals" className={sidebarNavLinkClasses}>
+                                    <FaBoxOpen className="inline-block mr-3 text-xl" /> {/* More specific icon */}
+                                    All Meals
                                 </NavLink>
                             </li>
- <li>
-                                <NavLink to="/dashboard/all-reviews">
-                                    <FaUserClock className="inline-block mr-2" />
-                                  All Reviews
+                            <li>
+                                <NavLink to="/dashboard/pending-meals" className={sidebarNavLinkClasses}> {/* Renamed route for clarity */}
+                                    <FaMotorcycle className="inline-block mr-3 text-xl" /> {/* Delivery icon */}
+                                    Serve Meals
                                 </NavLink>
                             </li>
-
+                            <li>
+                                <NavLink to="/dashboard/upcoming-meals" className={sidebarNavLinkClasses}> {/* Distinct route for admin upcoming meals */}
+                                    <FaUserClock className="inline-block mr-3 text-xl" />
+                                    Upcoming Meals 
+                                </NavLink>
+                            </li>
+                            <li>
+                                <NavLink to="/dashboard/all-reviews" className={sidebarNavLinkClasses}> {/* Distinct route for admin all reviews */}
+                                    <FaCheckCircle className="inline-block mr-3 text-xl" />
+                                    All Reviews 
+                                </NavLink>
+                            </li>
+                            {/* Example of another admin link */}
+                            {/* <li>
+                                <NavLink to="/dashboard/admin-stats" className={sidebarNavLinkClasses}>
+                                    <FaChartLine className="inline-block mr-3 text-xl" />
+                                    Admin Statistics
+                                </NavLink>
+                            </li> */}
                         </>
-                    }
+                    )}
+
+                    {/* Separator */}
+                    <div className="divider my-8 border-t border-gray-700"></div> {/* Stylish divider */}
+
+                    {/* Back to Home Link */}
+                    <li>
+                        <NavLink to="/" className={sidebarNavLinkClasses}>
+                            <FaHome className="inline-block mr-3 text-xl" />
+                            Back to Home
+                        </NavLink>
+                    </li>
                 </ul>
             </div>
         </div>
