@@ -79,12 +79,7 @@ const DashboardLayout = () => {
                             My Profile
                         </NavLink>
                     </li>
-                    <li>
-                        <NavLink to="/dashboard/paymentHistory" className={sidebarNavLinkClasses}>
-                            <FaFileInvoiceDollar className="inline-block mr-3 text-xl" /> {/* More specific icon */}
-                            Payment History
-                        </NavLink>
-                    </li>
+                    
 
                     {/* User Specific Links */}
                     {!roleLoading && role === 'user' && (
@@ -101,6 +96,12 @@ const DashboardLayout = () => {
                                     My Reviews
                                 </NavLink>
                             </li>
+                            <li>
+                        <NavLink to="/dashboard/paymentHistory" className={sidebarNavLinkClasses}>
+                            <FaFileInvoiceDollar className="inline-block mr-3 text-xl" /> {/* More specific icon */}
+                            Payment History
+                        </NavLink>
+                    </li>
                         </>
                     )}
 
