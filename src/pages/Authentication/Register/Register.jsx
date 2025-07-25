@@ -219,7 +219,7 @@ const Register = () => {
 
           {/* Name */}
           <div>
-            <label htmlFor="name" className="block text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+            <label htmlFor="name" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
               <FaUser className="text-primary-dark" /> Full Name
             </label>
             <input
@@ -234,7 +234,7 @@ const Register = () => {
 
           {/* Profile Image */}
           <div>
-            <label htmlFor="profileImage" className="block text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+            <label htmlFor="profileImage" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
               <FaImage className="text-primary-dark" /> Profile Picture
             </label>
             <input
@@ -260,7 +260,7 @@ const Register = () => {
 
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+            <label htmlFor="email" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
               <FaEnvelope className="text-primary-dark" /> Email
             </label>
             <input
@@ -275,7 +275,7 @@ const Register = () => {
 
           {/* Password */}
           <div>
-            <label htmlFor="password" className="block text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+            <label htmlFor="password" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
               <FaLock className="text-primary-dark" /> Password
             </label>
             <input
