@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router'; // Changed to react-router-dom for consistency
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
-import { FaStar } from 'react-icons/fa'; // Importing a star icon for ratings
+import { FaHeart, FaStar } from 'react-icons/fa'; // Importing a star icon for ratings
 
 const categories = ['Breakfast', 'Lunch', 'Dinner', 'All Meals'];
 
@@ -75,12 +75,12 @@ const MealsByCategory = () => {
 
                   {/* Rating and Price - now uncommented and styled */}
                   <div className="flex items-center justify-between mb-4">
-                    {meal.rating && (
-                      <div className="flex items-center text-yellow-500">
-                        <FaStar className="mr-1" />
-                        <span className="font-semibold text-gray-700">{meal.rating.toFixed(1)}</span> {/* Display rating with one decimal */}
+                    
+                      <div className="flex items-center text-red-600">
+                        <FaHeart className="mr-1" />
+                        <span className="font-semibold text-gray-700">{meal.likes}</span> 
                       </div>
-                    )}
+                   
                     {meal.price && (
                       <p className="text-xl font-bold text-primary-dark"> {/* Price in a distinct color */}
                         ${meal.price.toFixed(2)}
