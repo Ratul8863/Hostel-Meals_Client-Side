@@ -2,25 +2,24 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'; // Added useMutation, useQueryClient
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import useAuth from '../../../hooks/useAuth';
-import { FaPlus, FaImage, FaUtensils, FaDollarSign, FaListAlt, FaPencilAlt, FaUser, FaEnvelope, FaHeart, FaCalendarAlt, FaCheckCircle, FaTimes } from 'react-icons/fa'; // Added more icons
+import { FaPlus, FaImage, FaUtensils, FaDollarSign, FaListAlt, FaPencilAlt, FaUser, FaHeart, FaCalendarAlt, FaCheckCircle, FaTimes } from 'react-icons/fa';
 
 const MySwal = withReactContent(Swal);
-const ITEMS_PER_PAGE = 8; // Consistent items per page
+const ITEMS_PER_PAGE = 8;
 
 const UpcomingMeals = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
-  const queryClient = useQueryClient(); // Initialize queryClient
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null); // State for image preview
-  const [publishingId, setPublishingId] = useState(null); // State for tracking publishing meal
+  const [imagePreview, setImagePreview] = useState(null);
+  const [publishingId, setPublishingId] = useState(null);
 
   const { register, handleSubmit, reset, watch, formState: { errors } } = useForm();
 
-  // Watch image field to show preview in the modal
   const imageFile = watch("image");
   useEffect(() => {
     if (imageFile && imageFile.length > 0) {
@@ -31,17 +30,14 @@ const UpcomingMeals = () => {
     }
   }, [imageFile]);
 
-  // Fetch upcoming meals
   const { data: upcomingMeals = [], isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['upcoming-meals-admin'], // Distinct query key for admin view
+    queryKey: ['upcoming-meals-admin'],
     queryFn: async () => {
-      // Assuming backend sorts by likes by default or we can add a sort param if needed
       const res = await axiosSecure.get('/upcoming-meals?sortBy=likes');
       return res.data;
     },
   });
 
-  // Pagination logic
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(upcomingMeals.length / ITEMS_PER_PAGE);
   const paginatedMeals = upcomingMeals.slice(
@@ -55,13 +51,11 @@ const UpcomingMeals = () => {
     }
   };
 
-  // Mutation for adding a new upcoming meal
   const addUpcomingMealMutation = useMutation({
     mutationFn: async (mealData) => {
       const img_hosting_key = import.meta.env.VITE_image_upload_key;
       const img_hosting_url = `https://api.imgbb.com/1/upload?key=${img_hosting_key}`;
 
-      // Upload image
       const formData = new FormData();
       formData.append('image', mealData.image[0]);
       const imgRes = await fetch(img_hosting_url, { method: 'POST', body: formData });
@@ -78,7 +72,7 @@ const UpcomingMeals = () => {
         ingredients: mealData.ingredients,
         description: mealData.description,
         price: price,
-        likes: 0, // Initial likes for upcoming meals
+        likes: 0,
         image: imageUrl,
         addedBy: user?.email,
         distributorName: user?.displayName,
@@ -98,10 +92,10 @@ const UpcomingMeals = () => {
         },
         buttonsStyling: false,
       });
-      setIsModalOpen(false); // Close modal
-      reset(); // Reset form
-      setImagePreview(null); // Clear image preview
-      queryClient.invalidateQueries(['upcoming-meals-admin']); // Refetch upcoming meals
+      setIsModalOpen(false);
+      reset();
+      setImagePreview(null);
+      queryClient.invalidateQueries(['upcoming-meals-admin']);
     },
     onError: (mutationError) => {
       console.error("Error adding upcoming meal:", mutationError);
@@ -117,29 +111,26 @@ const UpcomingMeals = () => {
     },
   });
 
-  // Mutation for publishing a meal to main collection
   const publishMealMutation = useMutation({
     mutationFn: async (mealToPublish) => {
-      // Step 1: Add to main meals collection
       const mainMealData = {
         ...mealToPublish,
-        rating: 0, // Initial rating for published meal
-        reviews_count: 0, // Initial reviews count for published meal
-        postTime: new Date().toISOString(), // Use current time for publishing
+        rating: 0,
+        reviews_count: 0,
+        postTime: new Date().toISOString(),
       };
-      delete mainMealData._id; // Remove _id as it will be new in meals collection
+      delete mainMealData._id;
 
       const publishRes = await axiosSecure.post('/meals', mainMealData);
       if (!publishRes.data.insertedId) {
         throw new Error("Failed to add meal to main collection.");
       }
 
-      // Step 2: Delete from upcoming meals
       const deleteRes = await axiosSecure.delete(`/upcoming-meals/${mealToPublish._id}`);
-      if (deleteRes.status !== 200) { // Check status for successful deletion
+      if (deleteRes.status !== 200) {
         throw new Error("Failed to remove meal from upcoming meals after publishing.");
       }
-      return publishRes.data; // Return data from successful publish
+      return publishRes.data;
     },
     onSuccess: () => {
       MySwal.fire({
@@ -151,8 +142,8 @@ const UpcomingMeals = () => {
         },
         buttonsStyling: false,
       });
-      queryClient.invalidateQueries(['upcoming-meals-admin']); // Refetch upcoming meals
-      queryClient.invalidateQueries(['adminMeals']); // Invalidate All Meals to show new meal
+      queryClient.invalidateQueries(['upcoming-meals-admin']);
+      queryClient.invalidateQueries(['adminMeals']);
     },
     onError: (mutationError) => {
       console.error("Error publishing meal:", mutationError);
@@ -167,10 +158,9 @@ const UpcomingMeals = () => {
       });
     },
     onSettled: () => {
-      setPublishingId(null); // Clear publishing state regardless of success/failure
+      setPublishingId(null);
     }
   });
-
 
   const handleAddMealSubmit = (data) => {
     addUpcomingMealMutation.mutate(data);
@@ -196,7 +186,6 @@ const UpcomingMeals = () => {
     });
   };
 
-  // Loading, Error, and Empty States
   if (isLoading) {
     return <p className="text-center text-gray-600 text-xl py-10">Loading upcoming meals...</p>;
   }
@@ -205,7 +194,7 @@ const UpcomingMeals = () => {
   }
 
   return (
-    <div className="py-16 max-w-7xl mx-auto px-4"> {/* Consistent padding and max-width */}
+    <div className="py-16 max-w-7xl mx-auto px-4">
       <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800">
         Manage Upcoming Meals
       </h2>
@@ -213,21 +202,20 @@ const UpcomingMeals = () => {
         Oversee meals planned for future publication. Publish them to make them available to all users.
       </p>
 
-      <div className="flex justify-end items-center mb-8"> {/* Aligned to right */}
+      <div className="flex justify-end items-center mb-8">
         <button
-          onClick={() => { setIsModalOpen(true); reset(); setImagePreview(null); }} // Reset form and preview on open
+          onClick={() => { setIsModalOpen(true); reset(); setImagePreview(null); }}
           className="inline-flex items-center px-6 py-3 bg-primary-dark text-white font-semibold rounded-lg hover:bg-primary-light transition-colors duration-200 text-base shadow-md"
         >
           <FaPlus className="mr-2" /> Add Upcoming Meal
         </button>
       </div>
 
-      {/* Table */}
       {upcomingMeals.length === 0 ? (
         <p className="text-center text-gray-600 text-xl py-10">No upcoming meals to display at the moment.</p>
       ) : (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 p-6 md:p-8"> {/* Polished card container for the table */}
-          <div className="overflow-x-auto"> {/* Ensures table is scrollable on small screens */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 p-6 md:p-8">
+          <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -279,7 +267,7 @@ const UpcomingMeals = () => {
                       <button
                         onClick={() => handlePublishClick(meal)}
                         className="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-primary-dark text-white hover:bg-primary-light"
-                        disabled={publishingId === meal._id || publishMealMutation.isPending} // Disable button while publishing
+                        disabled={publishingId === meal._id || publishMealMutation.isPending}
                       >
                         {publishingId === meal._id ? 'Publishing...' : <><FaCheckCircle className="mr-2" /> Publish</>}
                       </button>
@@ -290,7 +278,6 @@ const UpcomingMeals = () => {
             </table>
           </div>
 
-          {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center mt-8 space-x-2">
               <button
@@ -327,13 +314,11 @@ const UpcomingMeals = () => {
         </div>
       )}
 
-      {/* Add Upcoming Meal Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg relative transform transition-all duration-300 scale-100 opacity-100">
+          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg relative transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto"> {/* Added max-h and overflow-y-auto */}
             <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Add New Upcoming Meal</h3>
 
-            {/* Close Button */}
             <button
               onClick={() => setIsModalOpen(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors duration-200"
@@ -343,7 +328,6 @@ const UpcomingMeals = () => {
             </button>
 
             <form onSubmit={handleSubmit(handleAddMealSubmit)} className="space-y-6">
-              {/* Title */}
               <div>
                 <label htmlFor="modal-title" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
                   <FaUtensils /> Meal Title
@@ -358,7 +342,6 @@ const UpcomingMeals = () => {
                 {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
               </div>
 
-              {/* Category */}
               <div>
                 <label htmlFor="modal-category" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
                   <FaListAlt /> Category
@@ -378,7 +361,6 @@ const UpcomingMeals = () => {
                 {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
               </div>
 
-              {/* Price */}
               <div>
                 <label htmlFor="modal-price" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
                   <FaDollarSign /> Price ($)
@@ -398,7 +380,6 @@ const UpcomingMeals = () => {
                 {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
               </div>
 
-              {/* Ingredients */}
               <div>
                 <label htmlFor="modal-ingredients" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
                   <FaPencilAlt /> Ingredients (comma-separated)
@@ -413,7 +394,6 @@ const UpcomingMeals = () => {
                 {errors.ingredients && <p className="text-red-500 text-sm mt-1">{errors.ingredients.message}</p>}
               </div>
 
-              {/* Description */}
               <div>
                 <label htmlFor="modal-description" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
                   <FaPencilAlt /> Description
@@ -428,7 +408,6 @@ const UpcomingMeals = () => {
                 {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
               </div>
 
-              {/* Image Upload */}
               <div>
                 <label htmlFor="modal-image" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
                   <FaImage /> Meal Image

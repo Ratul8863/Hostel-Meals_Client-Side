@@ -10,7 +10,7 @@ const RiderRoute = ({ children }) => {
         return <span className="loading loading-spinner loading-xl"></span>
     }
 
-    if (!user || role !== 'rider') {
+    if (!user || role !== 'user') {
         return <Navigate state={{ from: location.pathname }} to="/forbidden"></Navigate>
     }
 

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Outlet, Link } from 'react-router-dom'; // Changed to react-router-dom for consistency
-import login from "../assets/Lottie/Login.json" // Assuming this path is correct for your image asset
-import ProFastLogo from '../pages/shared/ProFastLogo/ProFastLogo'; // Assuming correct path to your logo component
+import { Outlet, Link } from 'react-router-dom'; 
+import login from "../assets/Lottie/Login.json" 
+import ProFastLogo from '../pages/shared/ProFastLogo/ProFastLogo'; 
 import Lottie from 'lottie-react';
 
 const AuthLayout = () => {

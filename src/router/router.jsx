@@ -4,25 +4,22 @@ import Home from "../pages/Home/Home/Home";
 import AuthLayout from "../layouts/AuthLayout";
 import Login from "../pages/Authentication/Login/Login";
 import Register from "../pages/Authentication/Register/Register";
-import Coverage from "../pages/Coverage/Coverage";
+
 import PrivateRoute from "../routes/PrivateRoute";
-import SendParcel from "../pages/SendParcel/SendParcel";
+
 import DashboardLayout from "../layouts/DashboardLayout";
-import MyParcels from "../pages/Dashboard/MyParcels/MyParcels";
+
 import Payment from "../pages/Dashboard/Payment/Payment";
 import PaymentHistory from "../pages/Dashboard/PaymentHistory/PaymentHistory";
-import TrackParcel from "../pages/Dashboard/TrackParcel/TrackParcel";
+
 
 import PendingRiders from "../pages/Dashboard/PendingRiders/PendingRiders";
 
 import MakeAdmin from "../pages/Dashboard/MakeAdmin/MakeAdmin";
 import Forbidden from "../pages/Forbidden/Forbidden";
 import AdminRoute from "../routes/AdminRoute";
-// import AssignRider from "../pages/Dashboard/AssignRider/AssignRider";
-import RiderRoute from "../routes/RiderRoute";
 
-import CompletedDeliveries from "../pages/Dashboard/CompletedDeliveries/CompletedDeliveries";
-import MyEarnings from "../pages/Dashboard/MyEarnings/MyEarnings";
+
 import DashboardHome from "../pages/Dashboard/DashboardHome/DashboardHome";
 import AddMeal from "../pages/Dashboard/Addmeal/Addmeal";
 import MealDetail from "../pages/Home/MealsByCategory/MealDetail";
@@ -37,6 +34,7 @@ import ProfileSection from "../pages/Dashboard/ProfileSection/ProfileSection";
 import MyRequestedMeals from "../pages/Dashboard/MyRequestedMeals/MyRequestedMeals";
 import MyReviews from "../pages/Dashboard/MyReviews/MyReviews";
 import AllReviews from "../pages/Dashboard/AllReviews/AllReviews";
+import RiderRoute from "../routes/RiderRoute";
 
 export const router = createBrowserRouter([
   {
@@ -47,11 +45,7 @@ export const router = createBrowserRouter([
         index: true,
         Component: Home
       },
-      {
-        path: 'coverage',
-        Component: Coverage,
-        loader: () => fetch('./serviceCenter.json')
-      },
+     
       {
         path: 'forbidden',
         Component: Forbidden
@@ -79,11 +73,7 @@ export const router = createBrowserRouter([
   path: '/checkout/:packageName',
   element: <PrivateRoute><CheckoutPage /></PrivateRoute>,
 },
-      {
-        path: 'sendParcel',
-        element: <PrivateRoute><SendParcel></SendParcel></PrivateRoute>,
-        loader: () => fetch('./serviceCenter.json')
-      }
+      
     ]
   },
   {
@@ -110,10 +100,7 @@ export const router = createBrowserRouter([
         index: true,
         Component: ProfileSection
       },
-      {
-        path: 'myParcels',
-        Component: MyParcels
-      },
+      
       {
         path: 'payment/:parcelId',
         Component: Payment
@@ -122,10 +109,7 @@ export const router = createBrowserRouter([
         path: 'paymentHistory',
         Component: PaymentHistory
       },
-      {
-        path: 'track',
-        Component: TrackParcel
-      },
+      
       {
         path: 'profile',
         Component: ProfileSection
@@ -134,38 +118,26 @@ export const router = createBrowserRouter([
       path: 'payment/membership/:packageName',  // ✅ New route for membership payment
       Component: Payment
     },
-      // rider only routes
+
+    
+      // user only routes
+      
       
       {
-        path: 'completed-deliveries',
-        element: <RiderRoute>
-          <CompletedDeliveries></CompletedDeliveries>
-        </RiderRoute>
-      },
-      {
-        path: 'my-earnings',
-        element: <RiderRoute>
-          <MyEarnings></MyEarnings>
-        </RiderRoute>
-      },
-      {
         path: 'my-meal-request',
-        element: 
-        <MyRequestedMeals></MyRequestedMeals>
+        element: <RiderRoute> <MyRequestedMeals></MyRequestedMeals></RiderRoute>
+       
         
       },
       {
         path: 'my-meal-reviews',
-        element: 
-     <MyReviews></MyReviews>
+        element: <RiderRoute><MyReviews></MyReviews></RiderRoute>
+     
         
       },
 
-      // admin only routes
-      // {
-      //   path: 'assign-rider',
-      //   element: <AdminRoute><AssignRider></AssignRider></AdminRoute>
-      // },
+      //admin routes 
+
       {
         path: 'pending-riders',
         element: <AdminRoute><PendingRiders></PendingRiders></AdminRoute>
@@ -181,7 +153,7 @@ export const router = createBrowserRouter([
       },
 
 
-// -----------------------------
+
 
  {
   path: '/dashboard/add-meal',
@@ -189,12 +161,12 @@ export const router = createBrowserRouter([
 },
 {
   path: '/dashboard/upcoming-meals',
-  element: <UpcomingMeals></UpcomingMeals>
+  element: <AdminRoute><UpcomingMeals></UpcomingMeals></AdminRoute>
 },
 
       {
   path: '/dashboard/all-meals',
-  element: <AdminRoute><AllMeals></AllMeals></AdminRoute>
+  element: <AllMeals></AllMeals>
 },
       {
   path: '/dashboard/all-reviews',

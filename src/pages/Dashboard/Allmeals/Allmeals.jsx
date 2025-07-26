@@ -4,7 +4,7 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import { Link } from 'react-router-dom'; // Changed to react-router-dom for consistency
-import { FaSort, FaEye, FaEdit, FaTrash, FaHeart, FaStar, FaUtensils, FaUserCircle, FaDollarSign, FaTimes, FaPencilAlt } from 'react-icons/fa'; // Icons for table headers and actions
+import { FaSort, FaEye, FaEdit, FaTrash, FaHeart, FaStar, FaUtensils, FaUserCircle, FaDollarSign, FaTimes, FaPencilAlt, FaImage, FaListAlt } from 'react-icons/fa'; // Added FaImage, FaListAlt
 
 const MySwal = withReactContent(Swal);
 const ITEMS_PER_PAGE = 8; // Consistent items per page
@@ -15,6 +15,13 @@ const AllMeals = () => {
   const [sortBy, setSortBy] = useState('');
   const [editingMeal, setEditingMeal] = useState(null); // State to hold meal being edited
   const [currentPage, setCurrentPage] = useState(1);
+  const [imageFile, setImageFile] = useState(null); // State for image file in edit modal
+  const [imagePreview, setImagePreview] = useState(null); // State for image preview in edit modal
+
+  // Watch image file for preview in edit modal
+  // This useEffect should be inside the component and trigger when editingMeal changes
+  // or when a new file is selected in the edit modal.
+  // For simplicity, we'll manage image preview directly in handleUpdateSubmit/modal render.
 
   // Fetch all meals with sorting
   const { data: meals = [], isLoading, isError, error } = useQuery({
@@ -60,7 +67,29 @@ const AllMeals = () => {
   // Mutation for updating a meal
   const updateMealMutation = useMutation({
     mutationFn: async ({ id, data }) => {
-      const res = await axiosSecure.patch(`/meals/${id}`, data);
+      // If a new image file is provided, upload it first
+      let imageUrl = data.image; // Assume existing image URL by default
+      if (data.newImage && data.newImage[0]) {
+        const img_hosting_key = import.meta.env.VITE_image_upload_key;
+        const img_hosting_url = `https://api.imgbb.com/1/upload?key=${img_hosting_key}`;
+        const formData = new FormData();
+        formData.append('image', data.newImage[0]);
+        const imgRes = await fetch(img_hosting_url, { method: 'POST', body: formData });
+        const imgData = await imgRes.json();
+        if (!imgData.success) throw new Error(imgData.error?.message || "Image upload failed for update");
+        imageUrl = imgData.data.display_url;
+      }
+
+      const updatedMealData = {
+        title: data.title,
+        price: parseFloat(data.price),
+        description: data.description,
+        category: data.category, // Include category in update
+        ingredients: data.ingredients, // Include ingredients in update
+        image: imageUrl, // Use new URL if uploaded, else existing
+      };
+
+      const res = await axiosSecure.patch(`/meals/${id}`, updatedMealData);
       return res.data;
     },
     onSuccess: () => {
@@ -74,6 +103,8 @@ const AllMeals = () => {
         buttonsStyling: false,
       });
       setEditingMeal(null); // Close modal
+      setImageFile(null); // Clear image file state
+      setImagePreview(null); // Clear image preview state
       queryClient.invalidateQueries(['adminMeals']); // Invalidate to refetch updated list
     },
     onError: (mutationError) => {
@@ -81,7 +112,7 @@ const AllMeals = () => {
       MySwal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Failed to update meal. Please try again.',
+        text: mutationError.message || 'Failed to update meal. Please try again.',
         customClass: {
           confirmButton: 'bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200',
         },
@@ -119,7 +150,10 @@ const AllMeals = () => {
       title: form.title.value,
       price: parseFloat(form.price.value),
       description: form.description.value,
-      // You might want to add more fields here if they are editable
+      category: form.category.value,
+      ingredients: form.ingredients.value,
+      image: editingMeal.image, // Keep existing image URL by default
+      newImage: imageFile, // Pass new image file if selected
     };
 
     // Basic validation for price
@@ -131,6 +165,25 @@ const AllMeals = () => {
     updateMealMutation.mutate({ id: editingMeal._id, data: updatedData });
   };
 
+  // Set up editing meal and image preview when edit button is clicked
+  const startEditing = (meal) => {
+    setEditingMeal(meal);
+    setImagePreview(meal.image); // Set current meal image as preview
+    setImageFile(null); // Clear any previously selected new file
+  };
+
+  // Handle image change in edit modal
+  const handleEditImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      setImageFile(null);
+      setImagePreview(editingMeal.image); // Revert to original if no new file selected
+    }
+  };
+
   // Pagination logic
   const totalPages = Math.ceil(meals.length / ITEMS_PER_PAGE);
   const paginatedMeals = meals.slice(
@@ -139,19 +192,22 @@ const AllMeals = () => {
   );
 
   return (
-    <div className="py-2 max-w-7xl mx-auto px-4"> {/* Consistent padding and max-width */}
+    <div className="py-16 max-w-7xl mx-auto px-4"> {/* Consistent padding and max-width */}
       <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800">
         Manage All Meals
       </h2>
+      <p className="text-center text-lg md:text-xl text-gray-600 mb-16 max-w-3xl mx-auto">
+        Oversee and manage all meals available on the platform. Edit details or remove meals as needed.
+      </p>
 
       {/* Sort By Section */}
-      <div className="flex items-center gap-4 mb-8 justify-end"> {/* Aligned to right */}
-        <label htmlFor="sort-select" className="text-gray-700 text-lg font-semibold">
-          <FaSort className="inline-block mr-2" /> Sort by:
+      <div className="flex flex-col sm:flex-row items-center gap-4 mb-8 justify-end"> {/* Aligned to right, responsive flex */}
+        <label htmlFor="sort-select" className="text-gray-700 text-lg font-semibold flex items-center gap-2">
+          <FaSort className="text-primary-dark" /> Sort by:
         </label>
         <select
           id="sort-select"
-          className="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-light appearance-none transition-colors duration-200"
+          className="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-light appearance-none transition-colors duration-200 w-full sm:w-auto"
           value={sortBy}
           onChange={(e) => {
             setSortBy(e.target.value);
@@ -177,25 +233,31 @@ const AllMeals = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">
+                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">
                     #
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Image
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <span className="flex items-center gap-2"><FaUtensils /> Title</span>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span className="flex items-center gap-2"><FaListAlt /> Category</span>
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span className="flex items-center gap-2"><FaDollarSign /> Price</span>
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <span className="flex items-center gap-2"><FaHeart /> Likes</span>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <span className="flex items-center gap-2"><FaStar /> Reviews</span>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-2"><FaStar /> Rating</span>
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <span className="flex items-center gap-2"><FaUserCircle /> Distributor</span>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">
+                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">
                     Actions
                   </th>
                 </tr>
@@ -206,8 +268,17 @@ const AllMeals = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                     </td>
+                    <td className="px py-4 whitespace-nowrap">
+                      <img src={meal.image || 'https://placehold.co/64x64/F0F0F0/888888?text=Meal'} className="w-20 h-16 object-cover rounded-lg border border-gray-200" alt={meal.title} />
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                       {meal.title}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize">
+                      {meal.category}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      ${typeof meal.price === 'number' ? meal.price.toFixed(2) : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                       {meal.likes || 0}
@@ -216,30 +287,27 @@ const AllMeals = () => {
                       {meal.reviews_count || 0}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {typeof meal.rating === 'number' ? meal.rating.toFixed(1) : 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                       {meal.distributorName || 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2"> {/* Responsive action buttons */}
                         <Link
                           to={`/meal/${meal._id}`}
-                          className="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          className="inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300"
                           title="View Details"
                         >
                           <FaEye className="mr-1" /> View
                         </Link>
                         <button
-                          onClick={() => setEditingMeal(meal)}
-                          className="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-yellow-500 text-white hover:bg-yellow-600"
+                          onClick={() => startEditing(meal)}
+                          className="inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-yellow-500 text-white hover:bg-yellow-600"
                           title="Edit Meal"
                         >
                           <FaEdit className="mr-1" /> Edit
                         </button>
                         <button
                           onClick={() => handleDelete(meal._id, meal.title)}
-                          className="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-red-600 text-white hover:bg-red-700"
+                          className="inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-red-600 text-white hover:bg-red-700"
                           disabled={deleteMealMutation.isPending}
                           title="Delete Meal"
                         >
@@ -293,7 +361,7 @@ const AllMeals = () => {
       {/* Edit Meal Modal */}
       {editingMeal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg relative transform transition-all duration-300 scale-100 opacity-100">
+          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg relative transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto"> {/* Added max-h and overflow-y-auto for responsiveness */}
             <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Edit Meal: {editingMeal.title}</h3>
             
             {/* Close Button */}
@@ -322,6 +390,27 @@ const AllMeals = () => {
                 />
               </div>
 
+              {/* Category */}
+              <div>
+                <label htmlFor="edit-category" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+                  <FaListAlt /> Category
+                </label>
+                <select
+                  id="edit-category"
+                  name="category"
+                  defaultValue={editingMeal.category}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-light appearance-none transition-colors duration-200"
+                  required
+                >
+                  <option value="">Select Category</option>
+                  <option value="Breakfast">Breakfast</option>
+                  <option value="Lunch">Lunch</option>
+                  <option value="Dinner">Dinner</option>
+                  <option value="Snacks">Snacks</option>
+                  <option value="Desserts">Desserts</option>
+                </select>
+              </div>
+
               {/* Price */}
               <div>
                 <label htmlFor="edit-price" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
@@ -333,8 +422,24 @@ const AllMeals = () => {
                   name="price"
                   defaultValue={editingMeal.price}
                   placeholder="Price"
-                  step="0.01"
+                 
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200"
+                  required
+                />
+              </div>
+
+              {/* Ingredients */}
+              <div>
+                <label htmlFor="edit-ingredients" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+                  <FaPencilAlt /> Ingredients (comma-separated)
+                </label>
+                <textarea
+                  id="edit-ingredients"
+                  name="ingredients"
+                  defaultValue={editingMeal.ingredients}
+                  placeholder="Ingredients (comma separated)"
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200 resize-y"
                   required
                 />
               </div>
@@ -353,6 +458,25 @@ const AllMeals = () => {
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200 resize-y"
                   required
                 />
+              </div>
+
+              {/* Image Upload for Edit */}
+              <div>
+                <label htmlFor="edit-image" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
+                  <FaImage /> Meal Image (Optional: Upload new image)
+                </label>
+                <input
+                  id="edit-image"
+                  type="file"
+                  accept="image/*"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-white hover:file:bg-primary-dark transition-colors duration-200 cursor-pointer"
+                  onChange={handleEditImageChange}
+                />
+                {imagePreview && (
+                  <div className="mt-4 flex justify-center">
+                    <img src={imagePreview} alt="Meal Preview" className="max-h-48 rounded-lg shadow-md border border-gray-200 object-cover" />
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end gap-3 mt-6">

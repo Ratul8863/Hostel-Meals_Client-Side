@@ -213,7 +213,7 @@ const PaymentForm = () => {
 
           <button
             type="submit"
-            className={`inline-flex items-center justify-center px-8 py-3 bg-primary-dark text-white font-semibold rounded-lg hover:bg-primary-light transition-colors duration-200 text-lg shadow-md w-full
+            className={`inline-flex  border-b border-t-5 items-center justify-center px-8 py-3 bg-primary-dark  font-semibold rounded-lg hover:bg-primary-light transition-colors duration-200 text-lg shadow-md w-full
               ${!stripe || !elements || processing || !clientSecret ? 'opacity-70 cursor-not-allowed' : ''}`}
             disabled={!stripe || !elements || processing || !clientSecret}
           >

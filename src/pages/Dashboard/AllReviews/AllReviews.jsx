@@ -108,6 +108,23 @@ const AllReviews = () => {
     return <p className="text-center text-red-600 text-xl py-10">Error loading reviews: {error.message}</p>;
   }
 
+
+
+
+  const handleShowFullReview = (fullReview) => {
+  MySwal.fire({
+   
+    text: fullReview,
+    icon: 'info',
+    confirmButtonText: 'Close',
+    customClass: {
+      popup: 'rounded-lg p-4',
+      confirmButton: 'bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600',
+    },
+  });
+};
+
+console.log(paginatedReviews)
   return (
     <div className="py-16 max-w-7xl mx-auto px-4"> {/* Consistent padding and max-width */}
       <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800">
@@ -123,28 +140,32 @@ const AllReviews = () => {
         <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 p-6 md:p-8"> {/* Polished card container for the table */}
           <div className="overflow-x-auto"> {/* Ensures table is scrollable on small screens */}
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">
-                    #
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-2"><FaUtensils /> Meal Title</span>
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-2"><FaUserCircle /> User Name</span>
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-2"><FaCalendarAlt /> Reviewed On</span>
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Review
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
+             <thead className="bg-gray-50">
+  <tr>
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">#</th>
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+      <span className="flex items-center gap-2"><FaUtensils /> Meal Title</span>
+    </th>
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+      <span className="flex items-center gap-2"><FaUserCircle /> User Name</span>
+    </th>
+    
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Review</th>
+    
+    {/* 👇 Added Likes */}
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+      <span className="flex items-center gap-2"><FaHeart className="text-red-500" /> Likes</span>
+    </th>
+    
+    {/* 👇 Added Reviews Count */}
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+      <span className="flex items-center gap-2"><FaStar className="text-yellow-500" /> Reviews Count</span>
+    </th>
+
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
+  </tr>
+</thead>
+
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedReviews.map((review, index) => (
                   <tr key={review._id} className="hover:bg-gray-50 transition-colors duration-150">
@@ -157,12 +178,22 @@ const AllReviews = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                       {review.userName || 'N/A'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {review.postTime ? new Date(review.postTime).toLocaleDateString() : 'N/A'}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-700 max-w-xs truncate" title={review.review}>
-                      {review.review || 'No review text'}
-                    </td>
+                   
+                    <td
+  className="px-6 py-4 text-sm text-gray-700 max-w-xs cursor-pointer hover:text-blue-600 transition duration-200"
+  title="Click to view full review"
+  onClick={() => handleShowFullReview(review.review)}
+>
+  {review?.review?.length > 40 ? `${review.review.slice(0, 40)}...` : review.review || 'No review text'}
+</td>
+
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+  {review.likes ?? 0}
+</td>
+<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+  {review.reviews_count ?? 0}
+</td>
+
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex gap-2">
                         <Link
