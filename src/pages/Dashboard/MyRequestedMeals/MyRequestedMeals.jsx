@@ -26,6 +26,7 @@ const MyRequestedMeals = () => {
     enabled: !!user?.email && !authLoading, // Only fetch if user email is available and auth is not loading
   });
 console.log(user.email)
+console.log(requestedMeals)
   // Sort meals: pending first, then delivered
   // This sort is done client-side to avoid needing backend indexes for sorting.
   const sortedMeals = [...requestedMeals].sort((a, b) => {

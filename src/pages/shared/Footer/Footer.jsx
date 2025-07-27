@@ -11,7 +11,7 @@ const Footer = () => {
         {/* Brand/About Section */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left">
           {/* You can replace this h2 with your ProFastLogo component if available */}
-          <h2 className="text-3xl font-extrabold text-white mb-4">MealMagic</h2> 
+          <h2 className="text-3xl font-extrabold text-white mb-4">Hostel Meals</h2> 
           {/* <ProFastLogo className="text-white h-10 mb-4" /> */} {/* Example if you have a logo component */}
           <p className="mt-3 text-base text-gray-400 leading-relaxed">
             Discover the taste of freshness. Plan your meals, get recommendations, and share reviews! Your ultimate hostel meal companion.
@@ -53,7 +53,7 @@ const Footer = () => {
           <ul className="space-y-3 text-base text-gray-400"> {/* Increased space-y for better readability */}
             <li><Link to="/" className="hover:text-white transition-colors duration-200">Home</Link></li>
             <li><Link to="/meals" className="hover:text-white transition-colors duration-200">Meals</Link></li>
-            <li><Link to="/upcoming-meals" className="hover:text-white transition-colors duration-200">Upcoming Meals</Link></li>
+            <li><Link to="/UpcomingMealsUser" className="hover:text-white transition-colors duration-200">Upcoming Meals</Link></li>
             <li><Link to="/dashboard" className="hover:text-white transition-colors duration-200">Dashboard</Link></li>
             <li><Link to="/about-us" className="hover:text-white transition-colors duration-200">About Us</Link></li> {/* Added a generic About Us link */}
           </ul>
@@ -66,7 +66,7 @@ const Footer = () => {
             <li><Link to="/meals?category=breakfast" className="hover:text-white transition-colors duration-200">Breakfast</Link></li>
             <li><Link to="/meals?category=lunch" className="hover:text-white transition-colors duration-200">Lunch</Link></li>
             <li><Link to="/meals?category=dinner" className="hover:text-white transition-colors duration-200">Dinner</Link></li>
-            <li><Link to="/meals?category=snacks" className="hover:text-white transition-colors duration-200">Snacks</Link></li>
+            {/* <li><Link to="/meals?category=snacks" className="hover:text-white transition-colors duration-200">Snacks</Link></li> */}
           </ul>
         </div>
 

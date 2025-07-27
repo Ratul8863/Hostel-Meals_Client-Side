@@ -112,7 +112,7 @@ const MyReviews = () => {
         customClass: {
           confirmButton: 'bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200',
         },
-        buttonsStyling: false,
+        
       });
     },
   });
@@ -248,7 +248,7 @@ const MyReviews = () => {
                           <>
                             <button
                               onClick={() => saveEdit(review._id)}
-                              className="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-primary-dark text-white hover:bg-primary-light"
+                              className="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-gray-700 text-white hover:bg-gray-900"
                               disabled={updateMutation.isPending}
                               title="Save Changes"
                             >

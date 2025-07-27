@@ -2,10 +2,12 @@ import React from 'react'; // React is implicitly used by JSX, good to keep
 import { useQuery } from '@tanstack/react-query';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import { FaQuoteLeft } from 'react-icons/fa'; // Importing a quote icon for testimonials
+import useAuth from '../../../hooks/useAuth';
 
 const CustomerTestimonials = () => {
   const axiosSecure = useAxiosSecure();
-
+  
+const {user}= useAuth();
   const { data: reviews = [], isLoading, isError } = useQuery({ // Added isLoading and isError for better feedback
     queryKey: ['reviews'],
     queryFn: async () => {
@@ -13,6 +15,23 @@ const CustomerTestimonials = () => {
       return res.data;
     },
   });
+
+
+   const {
+    data: userInfo = {},
+    isLoading: userInfoLoading,
+    isError: userInfoError,
+  } = useQuery({
+    queryKey: ['user', user?.email],
+    queryFn: async () => {
+      const res = await axiosSecure.get(`/users/${user.email}`);
+      return res.data;
+    },
+    enabled: !!user?.email,
+  });
+
+
+
 console.log(reviews)
   return (
     <div className="py-16 max-w-7xl mx-auto px-4"> {/* Consistent padding and max-width with other sections */}
@@ -41,7 +60,7 @@ console.log(reviews)
 
               <div className="flex items-center mt-auto"> {/* Aligned to bottom */}
                 <img
-                  src={review.userPhoto || `https://placehold.co/60x60/F0F0F0/888888?text=${review.userName ? review.userName.charAt(0) : 'U'}`} // Placeholder or initial if no photo
+                  src={review.photoURL || `https://placehold.co/60x60/F0F0F0/888888?text=${review.userName ? review.userName.charAt(0) : 'U'}`} // Placeholder or initial if no photo
                   alt={review.userName || 'User'}
                   className="w-14 h-14 rounded-full object-cover mr-4 border-2 border-gray-200" // Circular image, subtle border
                 />

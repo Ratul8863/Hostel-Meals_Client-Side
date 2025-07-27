@@ -1,10 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react'; // Added useRef for potential future use, though not directly used in this version
-import { useParams, useNavigate } from 'react-router-dom'; // Changed to react-router-dom for consistency
+import React, { useEffect, useRef, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import Swal from 'sweetalert2'; // Keeping Swal for now as it's a custom alert, not a browser alert
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 import useAuth from '../../../hooks/useAuth';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
-import { FaHeart, FaRegHeart, FaStar, FaUserCircle } from 'react-icons/fa'; // Icons for like, rating, and user placeholder
+import { FaHeart, FaRegHeart, FaStar, FaUserCircle, FaUtensils, FaDollarSign, FaListAlt, FaPencilAlt, FaCalendarAlt } from 'react-icons/fa'; // Added more icons for consistency
+
+const MySwal = withReactContent(Swal);
 
 const MealDetail = () => {
   const { id } = useParams();
@@ -44,7 +47,7 @@ const MealDetail = () => {
     },
     enabled: !!user?.email, // Only run query if user email is available
   });
-
+console.log(userInfo)
   // Update liked status when meal data or user changes
   useEffect(() => {
     if (meal && meal.likedBy?.includes(user?.email)) {
@@ -58,38 +61,50 @@ const MealDetail = () => {
   const toggleLikeMutation = useMutation({
     mutationFn: async () => {
       if (!user) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Login Required',
-          text: 'Please log in to like/unlike meals.',
-          confirmButtonText: 'Login',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate('/login');
-          }
-        });
-        return; // Prevent further execution if not logged in
+        // Throw an error if user is not logged in to trigger onError
+        throw new Error('Not logged in');
       }
       return await axiosSecure.patch(`/meal/${id}/toggle-like`, { email: user.email });
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['meal', id]); // Invalidate meal query to refetch updated likes
-      setLiked(prev => !prev); // Optimistically update UI
+      setLiked(prev => !prev); // Optimistically update UI only on successful API call
     },
     onError: (error) => {
       console.error("Error toggling like:", error);
-      Swal.fire('Error', 'Failed to update like status.', 'error');
+      if (error.message === 'Not logged in') {
+        MySwal.fire({
+          icon: 'warning',
+          title: 'Login Required',
+          text: 'Please log in to like/unlike meals.',
+          confirmButtonText: 'Login',
+          customClass: {
+            confirmButton: '  px-6 py-2 rounded-lg hover:bg-primary-light transition-colors duration-200',
+          },
+         
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate('/login');
+          }
+        });
+      } else {
+        MySwal.fire('Error', 'Failed to update like status. Please try again.', 'error');
+      }
     }
   });
 
   // Handle meal request with membership check
   const handleRequest = async () => {
     if (!user) {
-      Swal.fire({
+      MySwal.fire({
         icon: 'warning',
         title: 'Login Required',
         text: 'Please log in to request meals.',
         confirmButtonText: 'Login',
+        customClass: {
+          confirmButton: 'bg-primary-dark text-white px-6 py-2 rounded-lg hover:bg-primary-light transition-colors duration-200',
+        },
+      
       }).then((result) => {
         if (result.isConfirmed) {
           navigate('/login');
@@ -102,11 +117,15 @@ const MealDetail = () => {
     const membership = userInfo.membership?.toLowerCase() || 'bronze'; // Ensure lowercase for comparison
 
     if (!allowedMemberships.includes(membership)) {
-      Swal.fire({
+      MySwal.fire({
         icon: 'warning',
         title: 'Subscription Required',
         text: 'You need a valid subscription (Silver, Gold, or Platinum) to request meals.',
-        confirmButtonText: 'View Membership Plans'
+        confirmButtonText: 'View Membership Plans',
+        customClass: {
+          confirmButton: 'bg-primary-dark text-white px-6 py-2 rounded-lg hover:bg-primary-light transition-colors duration-200',
+        },
+        
       }).then(result => {
         if (result.isConfirmed) {
           navigate('/membership');
@@ -124,10 +143,10 @@ const MealDetail = () => {
         status: 'pending'
       });
 
-      Swal.fire('Requested!', 'Meal request submitted successfully. Check your dashboard for status.', 'success');
+      MySwal.fire('Requested!', 'Meal request submitted successfully. Check your dashboard for status.', 'success');
     } catch (err) {
       console.error("Error submitting meal request:", err);
-      Swal.fire('Error', 'Failed to submit meal request. Please try again.', 'error');
+      MySwal.fire('Error', 'Failed to submit meal request. Please try again.', 'error');
     }
   };
 
@@ -135,11 +154,15 @@ const MealDetail = () => {
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
-      Swal.fire({
+      MySwal.fire({
         icon: 'warning',
         title: 'Login Required',
         text: 'Please log in to submit a review.',
         confirmButtonText: 'Login',
+        customClass: {
+          confirmButton: 'bg-primary-dark text-white px-6 py-2 rounded-lg hover:bg-primary-light transition-colors duration-200',
+        },
+        buttonsStyling: false,
       }).then((result) => {
         if (result.isConfirmed) {
           navigate('/login');
@@ -148,7 +171,7 @@ const MealDetail = () => {
       return;
     }
     if (!reviewText.trim()) {
-      Swal.fire('Empty Review', 'Please write something before submitting.', 'warning');
+      MySwal.fire('Empty Review', 'Please write something before submitting.', 'warning');
       return;
     }
 
@@ -158,18 +181,18 @@ const MealDetail = () => {
         mealTitle: meal.title,
         userName: user.displayName,
         userEmail: user.email,
-        // likes: meal.likes, // Likes for the meal, not the review itself here
+        photoURL: user.photoURL,
         review: reviewText,
-        postTime: new Date().toISOString() // Add post time for the review
+        postTime: new Date().toISOString()
       });
 
       setReviewText('');
-      Swal.fire('Thank you!', 'Your review has been submitted.', 'success');
-      queryClient.invalidateQueries(['reviews', id]); // Invalidate reviews query to refetch
-      queryClient.invalidateQueries(['meal', id]); // Also invalidate meal to update review count if applicable
+      MySwal.fire('Thank you!', 'Your review has been submitted.', 'success');
+      queryClient.invalidateQueries(['reviews', id]);
+      queryClient.invalidateQueries(['meal', id]);
     } catch (err) {
       console.error("Error submitting review:", err);
-      Swal.fire('Error', 'Failed to submit review. Please try again.', 'error');
+      MySwal.fire('Error', 'Failed to submit review. Please try again.', 'error');
     }
   };
 
@@ -185,23 +208,24 @@ const MealDetail = () => {
     description,
     ingredients,
     postTime,
-    likes = 0, // Default to 0 if undefined
-    rating = 'N/A', // Default to 'N/A' if undefined
+    likes = 0,
+    rating = 'N/A',
   } = meal;
 
   // Format ingredients for display
   const formattedIngredients = Array.isArray(ingredients) ? ingredients.join(', ') : ingredients;
 
   return (
-    <div className="py-16 max-w-6xl mx-auto px-4"> {/* Consistent padding and max-width */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 p-8 md:p-10"> {/* Main card container */}
+    <div className="py-16 max-w-6xl mx-auto px-4">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 p-8 md:p-10">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Meal Image */}
           <div className="md:w-1/2 flex justify-center items-center">
             <img
-              src={image || 'https://placehold.co/800x600?text=Meal+Image'} // Placeholder for missing image
+              src={image || 'https://placehold.co/800x600/F0F0F0/888888?text=Meal+Image'}
               alt={title}
-              className="w-full h-72 md:h-96 object-cover rounded-lg shadow-md" // Larger, rounded image
+              className="w-full h-72 md:h-96 object-cover rounded-lg shadow-md"
+              onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/800x600/F0F0F0/888888?text=Image+Error'; }} // Fallback for broken images
             />
           </div>
 
@@ -251,7 +275,7 @@ const MealDetail = () => {
 
               <button
                 onClick={handleRequest}
-                className="inline-flex items-center justify-center px-8 py-3 bg-gray-800  hover:bg-gray-900 text-white font-semibold rounded-lg hover:bg-primary-light transition-colors duration-200 text-lg" // Consistent button style
+                className="inline-flex items-center justify-center px-8 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg hover:bg-primary-light transition-colors duration-200 text-lg"
               >
                 🍽️ Request Meal
               </button>
@@ -260,7 +284,7 @@ const MealDetail = () => {
         </div>
 
         {/* Review Section */}
-        <div className="mt-16 pt-8 border-t border-gray-100"> {/* Separator for reviews */}
+        <div className="mt-16 pt-8 border-t border-gray-100">
           <h3 className="text-3xl font-bold text-gray-800 mb-8">Reviews ({reviews.length})</h3>
 
           {/* Review Submission Form */}
@@ -270,13 +294,13 @@ const MealDetail = () => {
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
               placeholder="Write your review here..."
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200 resize-y" // Polished textarea
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200 resize-y"
               rows={4}
             ></textarea>
             <button
               type="submit"
-              className="inline-block px-8 py-3 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-900 transition-colors duration-200 text-base mt-4" // Consistent button style
-              disabled={!user || handleReviewSubmit.isPending} // Disable if not logged in or submitting
+              className="inline-block px-8 py-3 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-900 transition-colors duration-200 text-base mt-4"
+              disabled={!user || reviewsLoading} // Disable if not logged in or reviews are loading
             >
               Submit Review
             </button>
@@ -291,14 +315,15 @@ const MealDetail = () => {
           ) : reviews.length === 0 ? (
             <p className="text-center text-gray-600 text-lg">No reviews yet. Be the first to share your experience!</p>
           ) : (
-            <div className="space-y-6"> {/* Spacing between reviews */}
+            <div className="space-y-6">
               {reviews.map((review) => (
-                <div key={review._id} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"> {/* Review card style */}
+                <div key={review._id} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                   <div className="flex items-center mb-4">
                     <img
-                      src={review.userPhoto || `https://placehold.co/48x48/F0F0F0/888888?text=${review.userName ? review.userName.charAt(0) : 'U'}`} // User photo or initial placeholder
+                      src={review.photoURL || `https://placehold.co/48x48/F0F0F0/888888?text=${review.userName ? review.userName.charAt(0) : 'U'}`}
                       alt={review.userName || 'User'}
                       className="w-12 h-12 rounded-full object-cover mr-4 border-2 border-gray-200"
+                      onError={(e) => { e.target.onerror = null; e.target.src = `https://placehold.co/48x48/F0F0F0/888888?text=${review.userName ? review.userName.charAt(0) : 'U'}`; }} // Fallback for broken user images
                     />
                     <div>
                       <p className="font-semibold text-gray-800 text-lg">{review.userName || 'Anonymous User'}</p>

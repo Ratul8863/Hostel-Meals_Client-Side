@@ -9,6 +9,7 @@ const categories = ['Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Desserts']; // Ex
 
 const MealsPage = () => {
   const axiosSecure = useAxiosSecure();
+  
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(''); // Renamed to selectedCategory for consistency
   const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });

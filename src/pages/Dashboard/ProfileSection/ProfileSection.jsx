@@ -47,13 +47,15 @@ const ProfileSection = () => {
       </div>
     );
   }
+console.log('hii',user)
+  console.log(userInfo)
 
   return (
     <div className="py-16 max-w-2xl mx-auto px-4"> {/* Consistent padding and max-width */}
       <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100 flex flex-col items-center text-center"> {/* Polished card style */}
         {/* Profile Image */}
         <img
-          src={photoURL || `https://placehold.co/120x120/F0F0F0/888888?text=${displayName ? displayName.charAt(0) : 'U'}`} // Placeholder with initial
+          src={userInfo.photoURL || `https://placehold.co/120x120/F0F0F0/888888?text=${displayName ? displayName.charAt(0) : 'U'}`} // Placeholder with initial
           alt={displayName || 'User Profile'}
           className="w-32 h-32 rounded-full border-4 border-primary-light object-cover shadow-md mb-6" // Larger, more prominent image
         />

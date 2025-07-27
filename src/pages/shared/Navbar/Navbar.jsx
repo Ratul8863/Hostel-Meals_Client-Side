@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, NavLink } from 'react-router'; // Changed to react-router-dom for consistency with modern React apps
+import { Link, NavLink } from 'react-router-dom'; // Changed to react-router-dom for consistency with modern React apps
 import ProFastLogo from '../ProFastLogo/ProFastLogo'; // Assuming this is your logo component
 import useAuth from '../../../hooks/useAuth'; // Assuming this is your authentication hook
 import { FaBell } from 'react-icons/fa'; // Importing the bell icon
@@ -86,7 +86,8 @@ const Navbar = () => {
 
     return (
         // Main Navbar container with a subtle shadow and bottom border for a clean separation
-        <div className="navbar bg-white shadow-sm px-6 py-3 border-b border-gray-100">
+        // Added sticky, top-0, and z-50 for sticky behavior
+        <div className="navbar bg-white shadow-sm px-6 py-3 border-b border-gray-100 sticky top-0 z-50">
             {/* Navbar Start Section (Logo and Mobile Dropdown) */}
             <div className="navbar-start">
                 {/* Mobile Dropdown Menu (Hamburger Icon) */}
@@ -136,7 +137,7 @@ const Navbar = () => {
                         />
                         {dropdownOpen && (
                             // Dropdown menu for logged-in users
-                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-10 p-2 transform origin-top-right transition-all duration-200 scale-100 opacity-100">
+                            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-100 p-2 transform origin-top-right transition-all duration-200 scale-100 opacity-100">
                                 <p className="font-semibold px-4 py-2 text-gray-800 border-b border-gray-100 mb-1">{user.displayName || 'User'}</p>
                                 <Link
                                     to="/dashboard"
