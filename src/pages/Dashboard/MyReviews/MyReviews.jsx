@@ -70,7 +70,7 @@ const MyReviews = () => {
       });
     },
     onError: (mutationError) => {
-      console.error("Error deleting review:", mutationError);
+      // console.error("Error deleting review:", mutationError);
       MySwal.fire({
         icon: 'error',
         title: 'Error',
@@ -104,7 +104,7 @@ const MyReviews = () => {
       queryClient.invalidateQueries(['my-reviews', user?.email]); // Refetch reviews
     },
     onError: (mutationError) => {
-      console.error("Error updating review:", mutationError);
+      // console.error("Error updating review:", mutationError);
       MySwal.fire({
         icon: 'error',
         title: 'Error',
@@ -127,7 +127,7 @@ const MyReviews = () => {
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'No, keep it',
       customClass: {
-        confirmButton: 'bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200',
+        confirmButton: 'bg-red-600 text-white px-6 py-2 mr-4 rounded-lg hover:bg-red-700 transition-colors duration-200',
         cancelButton: 'bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200',
       },
       buttonsStyling: false,

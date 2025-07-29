@@ -34,6 +34,7 @@ const CheckoutPage = () => {
 
   const handleProceedToPay = () => {
     // Navigate to the payment page with the package name
+     window.scrollTo(0, 0);
     navigate(`/dashboard/payment/membership/${packageName}`);
   };
 

@@ -4,6 +4,7 @@ import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom'; // Ensure Link is from react-router-dom
 import { FaStar } from 'react-icons/fa'; // For meal ratings
+import { Helmet } from 'react-helmet-async';
 
 const categories = ['Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Desserts']; // Extended categories for example
 
@@ -80,6 +81,10 @@ const MealsPage = () => {
 
   return (
     <div className="py-16 max-w-7xl mx-auto px-4"> {/* Consistent padding and max-width */}
+ <Helmet>
+              <title>Hostel Meals | Meals</title>
+            </Helmet>
+
       <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800">
         All Delicious Meals
       </h2>
@@ -179,12 +184,12 @@ const MealsPage = () => {
                     <p className="text-gray-600 mb-4 text-base flex-grow">{meal.description?.slice(0, 80)}...</p> {/* flex-grow for description */}
 
                     <div className="flex items-center justify-between mb-4">
-                      {meal.rating && (
+                     
                         <div className="flex items-center text-yellow-500">
                           <FaStar className="mr-1" />
-                          <span className="font-semibold text-gray-700">{meal.rating.toFixed(1)}</span>
+                          <span className="font-semibold text-gray-700">4.3</span>
                         </div>
-                      )}
+                     
                       {meal.price && (
                         <p className="text-xl font-bold text-primary-dark">
                           ${meal.price.toFixed(2)}

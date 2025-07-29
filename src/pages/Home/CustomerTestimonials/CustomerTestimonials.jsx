@@ -32,7 +32,7 @@ const {user}= useAuth();
 
 
 
-console.log(reviews)
+// console.log(reviews)
   return (
     <div className="py-16 max-w-7xl mx-auto px-4"> {/* Consistent padding and max-width with other sections */}
       <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800"> {/* Consistent heading style */}
@@ -49,10 +49,11 @@ console.log(reviews)
       ) : reviews.length === 0 ? (
         <p className="text-center text-gray-600 text-xl">No testimonials available yet. Be the first to share your experience!</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"> {/* Responsive grid, similar to product cards */}
+        <div  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"> {/* Responsive grid, similar to product cards */}
           {reviews.slice(0, 6).map((review) => ( // Limiting to 6 as per original code, consider a carousel for more
             <div
               key={review._id}
+              data-aos="flip-right"
               className="bg-white rounded-xl shadow-lg p-8 transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl border border-gray-100 flex flex-col" // Polished card style
             >
               <FaQuoteLeft className="text-primary-light text-4xl mb-6 opacity-70" /> {/* Prominent quote icon */}

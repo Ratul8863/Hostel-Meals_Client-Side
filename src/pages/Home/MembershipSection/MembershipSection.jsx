@@ -74,11 +74,12 @@ const handleChoose = (packageName) => {
       })
       
     } else {
+       window.scrollTo(0, 0);
       navigate(`/checkout/${packageName.toLowerCase()}`);
     }
   };
   
-console.log(packages)
+// console.log(packages)
   return (
     <div className="py-16 max-w-7xl mx-auto px-4"> {/* Increased padding and max-width for more breathing room */}
       <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800"> {/* Larger, bolder heading */}
@@ -88,7 +89,7 @@ console.log(packages)
         Choose the perfect plan to enhance your hostel meal journey. Each package offers unique benefits designed to make your life easier and more delicious.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"> {/* Responsive grid */}
+      <div data-aos="zoom-in-up" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"> {/* Responsive grid */}
         {packages.map(pkg => (
           <div
             key={pkg.name}

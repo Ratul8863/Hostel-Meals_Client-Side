@@ -16,7 +16,7 @@ const UpcomingMeals = () => {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
-  const [publishingId, setPublishingId] = useState(null);
+  const [publishingId, setPublishingId] = useState(null); // State to track the ID of the meal being published
 
   const { register, handleSubmit, reset, watch, formState: { errors } } = useForm();
 
@@ -158,7 +158,7 @@ const UpcomingMeals = () => {
       });
     },
     onSettled: () => {
-      setPublishingId(null);
+      setPublishingId(null); // Clear publishingId regardless of success or failure
     }
   });
 
@@ -175,12 +175,13 @@ const UpcomingMeals = () => {
       confirmButtonText: "Yes, Publish!",
       cancelButtonText: "Cancel",
       customClass: {
-        confirmButton: 'bg-primary-dark text-white px-6 py-2 rounded-lg hover:bg-primary-light transition-colors duration-200',
+        confirmButton: 'bg-green-600 text-white px-6 py-2 mr-4 rounded-lg hover:bg-primary-light transition-colors duration-200',
         cancelButton: 'bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200',
       },
       buttonsStyling: false,
     }).then((result) => {
       if (result.isConfirmed) {
+        setPublishingId(meal._id); // Set the ID of the meal being published
         publishMealMutation.mutate(meal);
       }
     });
@@ -205,7 +206,7 @@ const UpcomingMeals = () => {
       <div className="flex justify-end items-center mb-8">
         <button
           onClick={() => { setIsModalOpen(true); reset(); setImagePreview(null); }}
-          className="inline-flex items-center px-6 py-3 bg-primary-dark text-white font-semibold rounded-lg hover:bg-primary-light transition-colors duration-200 text-base shadow-md"
+          className="inline-flex items-center px-6 cursor-pointer py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-primary-light transition-colors duration-200 text-base shadow-md"
         >
           <FaPlus className="mr-2" /> Add Upcoming Meal
         </button>
@@ -248,7 +249,7 @@ const UpcomingMeals = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className=" py-4 whitespace-nowrap">
                       <img src={meal.image || 'https://placehold.co/64x64?text=Meal'} className="w-16 h-16 object-cover rounded-lg border border-gray-200" alt={meal.title} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
@@ -263,11 +264,11 @@ const UpcomingMeals = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                       {meal.distributorName || meal.addedBy || 'N/A'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         onClick={() => handlePublishClick(meal)}
-                        className="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-primary-dark text-white hover:bg-primary-light"
-                        disabled={publishingId === meal._id || publishMealMutation.isPending}
+                        className="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-gray-700 text-white hover:bg-gray-900"
+                        disabled={publishingId === meal._id || publishMealMutation.isPending} // Disable only the current publishing button
                       >
                         {publishingId === meal._id ? 'Publishing...' : <><FaCheckCircle className="mr-2" /> Publish</>}
                       </button>
@@ -278,7 +279,7 @@ const UpcomingMeals = () => {
             </table>
           </div>
 
-          {totalPages > 1 && (
+          {totalPages >= 1 && (
             <div className="flex justify-center items-center mt-8 space-x-2">
               <button
                 className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -316,7 +317,7 @@ const UpcomingMeals = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg relative transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto"> {/* Added max-h and overflow-y-auto */}
+          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg relative transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto">
             <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Add New Upcoming Meal</h3>
 
             <button

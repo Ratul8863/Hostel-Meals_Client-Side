@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router-dom'; // Changed to react-router-dom for consistency
+import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content'; // Import for custom Swal styling
+import withReactContent from 'sweetalert2-react-content';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
-import { FaUtensils, FaHeart, FaStar, FaTrash, FaEye, FaUserCircle, FaCalendarAlt } from 'react-icons/fa'; // Icons for table headers and actions
+import { FaUtensils, FaHeart, FaStar, FaTrash, FaEye, FaUserCircle, FaCalendarAlt } from 'react-icons/fa';
 
-const MySwal = withReactContent(Swal); // Initialize SweetAlert with React content
-const ITEMS_PER_PAGE = 10; // Consistent items per page
+const MySwal = withReactContent(Swal);
+const ITEMS_PER_PAGE = 10;
 
 const AllReviews = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
+  const [deletingReviewId, setDeletingReviewId] = useState(null); // New state to track the ID of the review being deleted
 
   // Fetch all reviews for admin
   const { data: reviews = [], isLoading, isError, error } = useQuery({
-    queryKey: ['all-reviews-admin'], // Distinct query key for admin view
+    queryKey: ['all-reviews-admin'],
     queryFn: async () => {
       const res = await axiosSecure.get('/admin/reviews');
       return res.data;
@@ -30,7 +31,7 @@ const AllReviews = () => {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['all-reviews-admin']); // Invalidate to refetch updated list
+      queryClient.invalidateQueries(['all-reviews-admin']);
       MySwal.fire({
         icon: 'success',
         title: 'Deleted!',
@@ -53,6 +54,9 @@ const AllReviews = () => {
         buttonsStyling: false,
       });
     },
+    onSettled: () => {
+      setDeletingReviewId(null); // Clear the deleting ID regardless of success or failure
+    }
   });
 
   // Handle delete confirmation
@@ -65,26 +69,23 @@ const AllReviews = () => {
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'Cancel',
       customClass: {
-        confirmButton: 'bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200',
+        confirmButton: 'bg-red-600 text-white px-6 py-2 mr-4 rounded-lg hover:bg-red-700 transition-colors duration-200',
         cancelButton: 'bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200',
       },
       buttonsStyling: false,
     }).then((result) => {
       if (result.isConfirmed) {
+        setDeletingReviewId(id); // Set the ID of the review being deleted
         deleteMutation.mutate(id);
       }
     });
   };
 
-  // Sort reviews by reviews_count descending (if reviews_count is part of review object)
-  // Assuming 'reviews_count' here refers to the count of reviews on the meal,
-  // not the review itself. If it's a field on the review, it should be adjusted.
-  // For now, sorting by postTime to show most recent reviews first, as 'reviews_count' on a single review
-  // doesn't typically make sense for sorting.
+  // Sort reviews by postTime to show most recent reviews first
   const sortedReviews = [...reviews].sort((a, b) => {
-    const dateA = new Date(a.postTime || 0); // Assuming 'postTime' exists on review object
+    const dateA = new Date(a.postTime || 0);
     const dateB = new Date(b.postTime || 0);
-    return dateB - dateA; // Sort descending by date
+    return dateB - dateA;
   });
 
   // Pagination calculations
@@ -100,6 +101,19 @@ const AllReviews = () => {
     }
   };
 
+  // Function to show full review in a SweetAlert modal
+  const handleShowFullReview = (fullReview) => {
+    MySwal.fire({
+      text: fullReview,
+      icon: 'info',
+      confirmButtonText: 'Close',
+      customClass: {
+        popup: 'rounded-lg p-4',
+        confirmButton: 'bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600',
+      },
+    });
+  };
+
   // Loading, Error, and Empty States
   if (isLoading) {
     return <p className="text-center text-gray-600 text-xl py-10">Loading reviews...</p>;
@@ -108,25 +122,8 @@ const AllReviews = () => {
     return <p className="text-center text-red-600 text-xl py-10">Error loading reviews: {error.message}</p>;
   }
 
-
-
-
-  const handleShowFullReview = (fullReview) => {
-  MySwal.fire({
-   
-    text: fullReview,
-    icon: 'info',
-    confirmButtonText: 'Close',
-    customClass: {
-      popup: 'rounded-lg p-4',
-      confirmButton: 'bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600',
-    },
-  });
-};
-
-console.log(paginatedReviews)
   return (
-    <div className="py-16 max-w-7xl mx-auto px-4"> {/* Consistent padding and max-width */}
+    <div className="py-16 max-w-7xl mx-auto px-4">
       <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800">
         Manage All Reviews
       </h2>
@@ -137,35 +134,28 @@ console.log(paginatedReviews)
       {reviews.length === 0 ? (
         <p className="text-center text-gray-600 text-xl py-10">No reviews to display at the moment.</p>
       ) : (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 p-6 md:p-8"> {/* Polished card container for the table */}
-          <div className="overflow-x-auto"> {/* Ensures table is scrollable on small screens */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 p-6 md:p-8">
+          <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-             <thead className="bg-gray-50">
-  <tr>
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">#</th>
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-      <span className="flex items-center gap-2"><FaUtensils /> Meal Title</span>
-    </th>
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-      <span className="flex items-center gap-2"><FaUserCircle /> User Name</span>
-    </th>
-    
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Review</th>
-    
-    {/* 👇 Added Likes */}
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-      <span className="flex items-center gap-2"><FaHeart className="text-red-500" /> Likes</span>
-    </th>
-    
-    {/* 👇 Added Reviews Count */}
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-      <span className="flex items-center gap-2"><FaStar className="text-yellow-500" /> Reviews Count</span>
-    </th>
-
-    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
-  </tr>
-</thead>
-
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">#</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span className="flex items-center gap-2"><FaUtensils /> Meal Title</span>
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span className="flex items-center gap-2"><FaUserCircle /> User Name</span>
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Review</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span className="flex items-center gap-2"><FaHeart className="text-red-500" /> Likes</span>
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span className="flex items-center gap-2"><FaStar className="text-yellow-500" /> Reviews Count</span>
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
+                </tr>
+              </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedReviews.map((review, index) => (
                   <tr key={review._id} className="hover:bg-gray-50 transition-colors duration-150">
@@ -178,22 +168,19 @@ console.log(paginatedReviews)
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                       {review.userName || 'N/A'}
                     </td>
-                   
                     <td
-  className="px-6 py-4 text-sm text-gray-700 max-w-xs cursor-pointer hover:text-blue-600 transition duration-200"
-  title="Click to view full review"
-  onClick={() => handleShowFullReview(review.review)}
->
-  {review?.review?.length > 40 ? `${review.review.slice(0, 40)}...` : review.review || 'No review text'}
-</td>
-
+                      className="px-6 py-4 text-sm text-gray-700 max-w-xs cursor-pointer hover:text-blue-600 transition duration-200"
+                      title="Click to view full review"
+                      onClick={() => handleShowFullReview(review.review)}
+                    >
+                      {review?.review?.length > 40 ? `${review.review.slice(0, 40)}...` : review.review || 'No review text'}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-  {review.likes ?? 0}
-</td>
-<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-  {review.reviews_count ?? 0}
-</td>
-
+                      {review.likes ?? 0}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      {review.reviews_count ?? 0}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex gap-2">
                         <Link
@@ -206,10 +193,10 @@ console.log(paginatedReviews)
                         <button
                           onClick={() => handleDelete(review._id, review.mealTitle, review.userName)}
                           className="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-red-600 text-white hover:bg-red-700"
-                          disabled={deleteMutation.isPending}
+                          disabled={deletingReviewId === review._id || deleteMutation.isPending} // Disable only the current deleting button
                           title="Delete Review"
                         >
-                          {deleteMutation.isPending ? 'Deleting...' : <><FaTrash className="mr-1" /> Delete</>}
+                          {deletingReviewId === review._id ? 'Deleting...' : <><FaTrash className="mr-1" /> Delete</>}
                         </button>
                       </div>
                     </td>
@@ -220,7 +207,7 @@ console.log(paginatedReviews)
           </div>
 
           {/* Pagination Controls */}
-          {totalPages > 1 && (
+          {totalPages >= 1 && (
             <div className="flex justify-center items-center mt-8 space-x-2">
               <button
                 className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"

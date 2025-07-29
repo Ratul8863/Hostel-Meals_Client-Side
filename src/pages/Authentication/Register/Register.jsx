@@ -88,7 +88,7 @@ const Register = () => {
         throw new Error(res.data.error?.message || 'Image upload failed.');
       }
     } catch (err) {
-      console.error('Upload error:', err);
+      // console.error('Upload error:', err);
       MySwal.fire({
         icon: 'error',
         title: 'Upload failed',

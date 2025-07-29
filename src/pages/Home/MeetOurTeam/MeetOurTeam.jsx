@@ -60,9 +60,9 @@ const MeetOurTeam = () => {
               </p>
 
               {/* Membership */}
-              <p className="text-base text-gray-700 flex items-center gap-2">
+              {/* <p className="text-base text-gray-700 flex items-center gap-2">
                 <FaUserCheck className="text-green-500" /> Membership: <span className="font-semibold capitalize text-primary-dark">{admin.membership || 'Bronze'}</span>
-              </p>
+              </p> */}
 
               {/* Joined Date */}
               {admin.created_at && (

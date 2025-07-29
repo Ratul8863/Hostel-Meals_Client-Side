@@ -43,8 +43,8 @@ const RequestedMeals = () => {
       confirmButtonText: "Yes, Serve It!",
       cancelButtonText: "Cancel",
       customClass: {
-        confirmButton: 'bg-primary-dark text-white px-6 py-2 rounded-lg hover:bg-primary-light transition-colors duration-200',
-        cancelButton: 'bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200',
+        confirmButton: 'bg-gray-700 cursor-pointer text-white px-6 mr-4 py-2 rounded-lg hover:bg-gray-900 transition-colors duration-200',
+        cancelButton: 'bg-gray-200 cursor-pointer text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200',
       },
       buttonsStyling: false, // Disable default SweetAlert styling
     });
@@ -61,12 +61,12 @@ const RequestedMeals = () => {
         title: "Success!",
         text: "Meal marked as delivered.",
         customClass: {
-          confirmButton: 'bg-primary-dark text-white px-6 py-2 rounded-lg hover:bg-primary-light transition-colors duration-200',
+          confirmButton: 'bg-primary-dark  text-white px-6 py-2 rounded-lg hover:bg-primary-light transition-colors duration-200',
         },
         buttonsStyling: false,
       });
     } catch (err) {
-      console.error("Error updating meal status:", err);
+      //console.error("Error updating meal status:", err);
       MySwal.fire({
         icon: "error",
         title: "Error",
@@ -146,7 +146,7 @@ const RequestedMeals = () => {
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <span className="flex items-center gap-2"><FaEnvelope /> User Email</span>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">
@@ -180,10 +180,10 @@ const RequestedMeals = () => {
                         {meal.status || 'pending'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className=" py-4 whitespace-nowrap  text-sm font-medium">
                       {meal.status !== "delivered" ? (
                         <button
-                          className="inline-flex items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-primary-dark  hover:bg-primary-light"
+                          className="inline-flex cursor-pointer btn bg-green-400 items-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-primary-dark  hover:bg-primary-light"
                           onClick={() => handleServe(meal._id, meal.status, meal.mealTitle, meal.userName)}
                           title="Mark as Delivered"
                         >

@@ -5,6 +5,7 @@ import Swal from 'sweetalert2'; // For custom alerts
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 import useAuth from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom'; // For navigation to login/membership
+import { Helmet } from 'react-helmet-async';
 
 const UpcomingMealsUser = () => {
   const axiosSecure = useAxiosSecure();
@@ -93,6 +94,9 @@ const [likingMealId, setLikingMealId] = useState(null);
 
   return (
     <div className="py-16 max-w-7xl mx-auto px-4"> {/* Consistent padding and max-width */}
+     <Helmet>
+              <title>Hostel Meals | Upcoming Meals</title>
+            </Helmet>
       <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800">
         Discover Upcoming Meals
       </h2>
@@ -125,9 +129,13 @@ const [likingMealId, setLikingMealId] = useState(null);
                   <p className="text-gray-600 mb-4 text-base flex-grow">{meal.description?.slice(0, 80)}...</p> {/* Flex-grow for description */}
                   <p className="font-bold text-xl text-primary-dark mb-4">Price: ${meal.price?.toFixed(2) || 'N/A'}</p>
 
-                  <div className="flex justify-between items-center mt-auto"> {/* Aligned to bottom */}
+                  <div className="flex justify-between items-center mt-auto">
+                     {/* Aligned to bottom */}
                     <span className="text-lg text-gray-700 font-semibold">
+                      <div className='flex gap-1'>
+                        <FaHeart></FaHeart>
                       {meal.likes || 0} Likes
+                      </div>
                     </span>
 
                     {/* Like Button for Premium Users */}

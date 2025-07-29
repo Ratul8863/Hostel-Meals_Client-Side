@@ -22,7 +22,7 @@ const formatDate = (iso) => {
       hour12: true
     });
   } catch (error) {
-    console.error("Error formatting date:", error);
+    // console.error("Error formatting date:", error);
     return 'Invalid Date';
   }
 };
@@ -79,7 +79,7 @@ const PaymentHistory = () => {
 
   // Handle error states
   if (isError) {
-    console.error("Error fetching payments:", error);
+    // console.error("Error fetching payments:", error);
     return (
       <div className="flex justify-center items-center py-16">
         <p className="text-xl text-red-600">Failed to load payment history. Please try again later.</p>

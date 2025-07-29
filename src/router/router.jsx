@@ -35,10 +35,12 @@ import MyRequestedMeals from "../pages/Dashboard/MyRequestedMeals/MyRequestedMea
 import MyReviews from "../pages/Dashboard/MyReviews/MyReviews";
 import AllReviews from "../pages/Dashboard/AllReviews/AllReviews";
 import RiderRoute from "../routes/RiderRoute";
+import ErrorPage from "../pages/shared/ErrorPage/ErrorPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
+    errorElement: <ErrorPage></ErrorPage>,
     Component: RootLayout,
     children: [
       {
@@ -78,6 +80,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/',
+     errorElement: <ErrorPage></ErrorPage>,
     Component: AuthLayout,
     children: [
       {
@@ -92,6 +95,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/dashboard',
+     errorElement: <ErrorPage></ErrorPage>,
     element: <PrivateRoute>
       <DashboardLayout></DashboardLayout>
     </PrivateRoute>,

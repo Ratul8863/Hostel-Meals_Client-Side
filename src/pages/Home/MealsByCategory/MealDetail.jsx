@@ -6,6 +6,7 @@ import withReactContent from 'sweetalert2-react-content';
 import useAuth from '../../../hooks/useAuth';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import { FaHeart, FaRegHeart, FaStar, FaUserCircle, FaUtensils, FaDollarSign, FaListAlt, FaPencilAlt, FaCalendarAlt } from 'react-icons/fa'; // Added more icons for consistency
+import { Helmet } from 'react-helmet-async';
 
 const MySwal = withReactContent(Swal);
 
@@ -47,7 +48,7 @@ const MealDetail = () => {
     },
     enabled: !!user?.email, // Only run query if user email is available
   });
-console.log(userInfo)
+// console.log(userInfo)
   // Update liked status when meal data or user changes
   useEffect(() => {
     if (meal && meal.likedBy?.includes(user?.email)) {
@@ -71,7 +72,7 @@ console.log(userInfo)
       setLiked(prev => !prev); // Optimistically update UI only on successful API call
     },
     onError: (error) => {
-      console.error("Error toggling like:", error);
+      // console.error("Error toggling like:", error);
       if (error.message === 'Not logged in') {
         MySwal.fire({
           icon: 'warning',
@@ -84,6 +85,7 @@ console.log(userInfo)
          
         }).then((result) => {
           if (result.isConfirmed) {
+             window.scrollTo(0, 0);
             navigate('/login');
           }
         });
@@ -107,6 +109,7 @@ console.log(userInfo)
       
       }).then((result) => {
         if (result.isConfirmed) {
+           window.scrollTo(0, 0);
           navigate('/login');
         }
       });
@@ -128,6 +131,7 @@ console.log(userInfo)
         
       }).then(result => {
         if (result.isConfirmed) {
+           window.scrollTo(0, 0);
           navigate('/membership');
         }
       });
@@ -145,7 +149,7 @@ console.log(userInfo)
 
       MySwal.fire('Requested!', 'Meal request submitted successfully. Check your dashboard for status.', 'success');
     } catch (err) {
-      console.error("Error submitting meal request:", err);
+      // console.error("Error submitting meal request:", err);
       MySwal.fire('Error', 'Failed to submit meal request. Please try again.', 'error');
     }
   };
@@ -165,6 +169,7 @@ console.log(userInfo)
         buttonsStyling: false,
       }).then((result) => {
         if (result.isConfirmed) {
+           window.scrollTo(0, 0);
           navigate('/login');
         }
       });
@@ -191,7 +196,7 @@ console.log(userInfo)
       queryClient.invalidateQueries(['reviews', id]);
       queryClient.invalidateQueries(['meal', id]);
     } catch (err) {
-      console.error("Error submitting review:", err);
+      // console.error("Error submitting review:", err);
       MySwal.fire('Error', 'Failed to submit review. Please try again.', 'error');
     }
   };
@@ -209,7 +214,7 @@ console.log(userInfo)
     ingredients,
     postTime,
     likes = 0,
-    rating = 'N/A',
+    rating,
   } = meal;
 
   // Format ingredients for display
@@ -217,6 +222,11 @@ console.log(userInfo)
 
   return (
     <div className="py-16 max-w-6xl mx-auto px-4">
+
+      <Helmet>
+              <title>Hostel Meals | Meal Details</title>
+            </Helmet>
+      
       <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 p-8 md:p-10">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Meal Image */}
@@ -253,7 +263,8 @@ console.log(userInfo)
               </div>
               <div className="flex items-center text-yellow-500 text-lg">
                 <FaStar className="mr-2" />
-                <span className="font-semibold text-gray-700">{typeof rating === 'number' ? rating.toFixed(1) : rating} Rating</span>
+                {/* {typeof rating === 'number' ? rating.toFixed(1) : rating} */}
+                <span className="font-semibold text-gray-700">{typeof rating === 'number' ? rating.toFixed(1) : rating}</span>
               </div>
             </div>
 

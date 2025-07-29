@@ -5,9 +5,11 @@ import { RouterProvider } from "react-router-dom"; // Changed to react-router-do
 import { router } from './router/router.jsx';
 
 import 'aos/dist/aos.css'; // AOS CSS for animations
-import Aos from 'aos'; // AOS library
+
 import AuthProvider from './contexts/AuthContext/AuthProvider.jsx'; // Your Auth context provider
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; // React Query for data fetching
+import { HelmetProvider } from 'react-helmet-async';
+import Aos from 'aos';
 
 // Initialize AOS (Animate On Scroll) library for scroll animations
 Aos.init({
@@ -27,9 +29,13 @@ createRoot(document.getElementById('root')).render(
     */}
     <div> 
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
+         <HelmetProvider>
+ <AuthProvider>
           <RouterProvider router={router} />
         </AuthProvider>
+
+         </HelmetProvider>
+       
       </QueryClientProvider>
     </div>
   </StrictMode>,

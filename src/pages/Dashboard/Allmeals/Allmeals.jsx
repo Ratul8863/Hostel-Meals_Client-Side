@@ -3,31 +3,27 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
-import { Link } from 'react-router-dom'; // Changed to react-router-dom for consistency
-import { FaSort, FaEye, FaEdit, FaTrash, FaHeart, FaStar, FaUtensils, FaUserCircle, FaDollarSign, FaTimes, FaPencilAlt, FaImage, FaListAlt } from 'react-icons/fa'; // Added FaImage, FaListAlt
+import { Link } from 'react-router-dom';
+import { FaSort, FaEye, FaEdit, FaTrash, FaHeart, FaStar, FaUtensils, FaUserCircle, FaDollarSign, FaTimes, FaPencilAlt, FaImage, FaListAlt } from 'react-icons/fa';
 
 const MySwal = withReactContent(Swal);
-const ITEMS_PER_PAGE = 8; // Consistent items per page
+const ITEMS_PER_PAGE = 10;
 
 const AllMeals = () => {
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
   const [sortBy, setSortBy] = useState('');
-  const [editingMeal, setEditingMeal] = useState(null); // State to hold meal being edited
+  const [editingMeal, setEditingMeal] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [imageFile, setImageFile] = useState(null); // State for image file in edit modal
-  const [imagePreview, setImagePreview] = useState(null); // State for image preview in edit modal
-
-  // Watch image file for preview in edit modal
-  // This useEffect should be inside the component and trigger when editingMeal changes
-  // or when a new file is selected in the edit modal.
-  // For simplicity, we'll manage image preview directly in handleUpdateSubmit/modal render.
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [deletingId, setDeletingId] = useState(null); // New state to track the ID of the meal being deleted
 
   // Fetch all meals with sorting
   const { data: meals = [], isLoading, isError, error } = useQuery({
     queryKey: ['adminMeals', sortBy],
     queryFn: async () => {
-      const res = await axiosSecure.get(`/admin/meals?sort=${sortBy}`); // Ensure your backend supports this sort parameter
+      const res = await axiosSecure.get(`/admin/meals?sort=${sortBy}`);
       return res.data;
     },
   });
@@ -48,7 +44,7 @@ const AllMeals = () => {
         },
         buttonsStyling: false,
       });
-      queryClient.invalidateQueries(['adminMeals']); // Invalidate to refetch updated list
+      queryClient.invalidateQueries(['adminMeals']);
     },
     onError: (mutationError) => {
       console.error("Error deleting meal:", mutationError);
@@ -62,13 +58,15 @@ const AllMeals = () => {
         buttonsStyling: false,
       });
     },
+    onSettled: () => {
+      setDeletingId(null); // Clear deletingId regardless of success or failure
+    }
   });
 
   // Mutation for updating a meal
   const updateMealMutation = useMutation({
     mutationFn: async ({ id, data }) => {
-      // If a new image file is provided, upload it first
-      let imageUrl = data.image; // Assume existing image URL by default
+      let imageUrl = data.image;
       if (data.newImage && data.newImage[0]) {
         const img_hosting_key = import.meta.env.VITE_image_upload_key;
         const img_hosting_url = `https://api.imgbb.com/1/upload?key=${img_hosting_key}`;
@@ -84,9 +82,9 @@ const AllMeals = () => {
         title: data.title,
         price: parseFloat(data.price),
         description: data.description,
-        category: data.category, // Include category in update
-        ingredients: data.ingredients, // Include ingredients in update
-        image: imageUrl, // Use new URL if uploaded, else existing
+        category: data.category,
+        ingredients: data.ingredients,
+        image: imageUrl,
       };
 
       const res = await axiosSecure.patch(`/meals/${id}`, updatedMealData);
@@ -102,10 +100,10 @@ const AllMeals = () => {
         },
         buttonsStyling: false,
       });
-      setEditingMeal(null); // Close modal
-      setImageFile(null); // Clear image file state
-      setImagePreview(null); // Clear image preview state
-      queryClient.invalidateQueries(['adminMeals']); // Invalidate to refetch updated list
+      setEditingMeal(null);
+      setImageFile(null);
+      setImagePreview(null);
+      queryClient.invalidateQueries(['adminMeals']);
     },
     onError: (mutationError) => {
       console.error("Error updating meal:", mutationError);
@@ -131,12 +129,13 @@ const AllMeals = () => {
       confirmButtonText: 'Yes, delete it!',
       cancelButtonText: 'Cancel',
       customClass: {
-        confirmButton: 'bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200',
+        confirmButton: 'bg-red-600 text-white px-6 py-2 rounded-lg mr-4 hover:bg-red-700 transition-colors duration-200',
         cancelButton: 'bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200',
       },
       buttonsStyling: false,
     }).then((result) => {
       if (result.isConfirmed) {
+        setDeletingId(mealId); // Set the ID of the meal being deleted
         deleteMealMutation.mutate(mealId);
       }
     });
@@ -152,11 +151,10 @@ const AllMeals = () => {
       description: form.description.value,
       category: form.category.value,
       ingredients: form.ingredients.value,
-      image: editingMeal.image, // Keep existing image URL by default
-      newImage: imageFile, // Pass new image file if selected
+      image: editingMeal.image,
+      newImage: imageFile,
     };
 
-    // Basic validation for price
     if (isNaN(updatedData.price) || updatedData.price < 0) {
       MySwal.fire('Invalid Price', 'Please enter a valid positive number for price.', 'error');
       return;
@@ -168,8 +166,8 @@ const AllMeals = () => {
   // Set up editing meal and image preview when edit button is clicked
   const startEditing = (meal) => {
     setEditingMeal(meal);
-    setImagePreview(meal.image); // Set current meal image as preview
-    setImageFile(null); // Clear any previously selected new file
+    setImagePreview(meal.image);
+    setImageFile(null);
   };
 
   // Handle image change in edit modal
@@ -180,7 +178,7 @@ const AllMeals = () => {
       setImagePreview(URL.createObjectURL(file));
     } else {
       setImageFile(null);
-      setImagePreview(editingMeal.image); // Revert to original if no new file selected
+      setImagePreview(editingMeal.image);
     }
   };
 
@@ -192,7 +190,7 @@ const AllMeals = () => {
   );
 
   return (
-    <div className="py-16 max-w-7xl mx-auto px-4"> {/* Consistent padding and max-width */}
+    <div className="py-16 max-w-7xl mx-auto px-4">
       <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800">
         Manage All Meals
       </h2>
@@ -201,7 +199,7 @@ const AllMeals = () => {
       </p>
 
       {/* Sort By Section */}
-      <div className="flex flex-col sm:flex-row items-center gap-4 mb-8 justify-end"> {/* Aligned to right, responsive flex */}
+      <div className="flex flex-col sm:flex-row items-center gap-4 mb-8 justify-end">
         <label htmlFor="sort-select" className="text-gray-700 text-lg font-semibold flex items-center gap-2">
           <FaSort className="text-primary-dark" /> Sort by:
         </label>
@@ -211,7 +209,7 @@ const AllMeals = () => {
           value={sortBy}
           onChange={(e) => {
             setSortBy(e.target.value);
-            setCurrentPage(1); // Reset page on sort change
+            setCurrentPage(1);
           }}
         >
           <option value="">Default</option>
@@ -228,8 +226,8 @@ const AllMeals = () => {
       ) : meals.length === 0 ? (
         <p className="text-center text-gray-600 text-xl py-10">No meals available to manage.</p>
       ) : (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 p-6 md:p-8"> {/* Polished card container for the table */}
-          <div className="overflow-x-auto"> {/* Ensures table is scrollable on small screens */}
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 p-6 md:p-8">
+          <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -240,22 +238,25 @@ const AllMeals = () => {
                     Image
                   </th>
                   <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-2"><FaUtensils /> Title</span>
+                    <span className="flex items-center justify-center gap-2"><FaUtensils /> Title</span>
                   </th>
                   <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-2"><FaListAlt /> Category</span>
+                    <span className="flex items-center justify-center gap-2"><FaListAlt /> Category</span>
                   </th>
                   <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-2"><FaDollarSign /> Price</span>
+                    <span className="flex items-center justify-center gap-2"><FaDollarSign /> Price</span>
                   </th>
                   <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-2"><FaHeart /> Likes</span>
+                    <span className="flex items-center justify-center gap-2"><FaHeart /> Likes</span>
                   </th>
                   <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-2"><FaStar /> Reviews</span>
+                    <span className="flex items-center justify-center gap-2"><FaStar /> Reviews</span>
+                  </th>
+                   <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span className="flex items-center justify-center gap-2"><FaStar /> Rating</span>
                   </th>
                   <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <span className="flex items-center gap-2"><FaUserCircle /> Distributor</span>
+                    <span className="flex items-center justify-center gap-2"><FaUserCircle /> Distributor</span>
                   </th>
                   <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">
                     Actions
@@ -265,32 +266,35 @@ const AllMeals = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedMeals.map((meal, index) => (
                   <tr key={meal._id} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
                       {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                     </td>
-                    <td className="px py-4 whitespace-nowrap">
+                    <td className=" py-4 whitespace-nowrap flex justify-center">
                       <img src={meal.image || 'https://placehold.co/64x64/F0F0F0/888888?text=Meal'} className="w-20 h-16 object-cover rounded-lg border border-gray-200" alt={meal.title} />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
                       {meal.title}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize text-center">
                       {meal.category}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
                       ${typeof meal.price === 'number' ? meal.price.toFixed(2) : 'N/A'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
                       {meal.likes || 0}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
                       {meal.reviews_count || 0}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                      {meal.rating || 0}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
                       {meal.distributorName || 'N/A'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex flex-col sm:flex-row gap-2"> {/* Responsive action buttons */}
+                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                      <div className="flex flex-col sm:flex-row gap-2 justify-center">
                         <Link
                           to={`/meal/${meal._id}`}
                           className="inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -308,10 +312,10 @@ const AllMeals = () => {
                         <button
                           onClick={() => handleDelete(meal._id, meal.title)}
                           className="inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-sm transition-colors duration-200 bg-red-600 text-white hover:bg-red-700"
-                          disabled={deleteMealMutation.isPending}
+                          disabled={deletingId === meal._id} // Disable only the current deleting button
                           title="Delete Meal"
                         >
-                          {deleteMealMutation.isPending ? 'Deleting...' : <><FaTrash className="mr-1" /> Delete</>}
+                          {deletingId === meal._id ? 'Deleting...' : <><FaTrash className="mr-1" /> Delete</>}
                         </button>
                       </div>
                     </td>
@@ -322,7 +326,7 @@ const AllMeals = () => {
           </div>
 
           {/* Pagination Controls */}
-          {totalPages > 1 && (
+          {totalPages >= 1 && (
             <div className="flex justify-center items-center mt-8 space-x-2">
               <button
                 className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -361,7 +365,7 @@ const AllMeals = () => {
       {/* Edit Meal Modal */}
       {editingMeal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg relative transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto"> {/* Added max-h and overflow-y-auto for responsiveness */}
+          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg relative transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto">
             <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Edit Meal: {editingMeal.title}</h3>
             
             {/* Close Button */}
@@ -422,7 +426,7 @@ const AllMeals = () => {
                   name="price"
                   defaultValue={editingMeal.price}
                   placeholder="Price"
-                 
+                  step="0.01"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200"
                   required
                 />

@@ -10,10 +10,16 @@ import MembershipSection from '../MembershipSection/MembershipSection';
 import CustomerTestimonials from '../CustomerTestimonials/CustomerTestimonials';
 import TopRatedMeals from '../TopRatedMeals/TopRatedMeals';
 import MeetOurTeam from '../MeetOurTeam/MeetOurTeam';
+import { Helmet } from 'react-helmet-async';
 
 const Home = () => {
     return (
         <div>
+ <Helmet>
+        <title>Hostel Meals | Home</title>
+      </Helmet>
+
+
            <BannerSection></BannerSection>
     
             <MealsByCategory></MealsByCategory>

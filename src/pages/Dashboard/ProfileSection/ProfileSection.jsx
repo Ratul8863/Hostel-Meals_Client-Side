@@ -20,12 +20,12 @@ const ProfileSection = () => {
   });
 
   const isAdmin = userInfo?.role === 'admin';
-
+console.log('hii',email)
   // Fetch meal count for admins
   const { data: mealCountData = { count: 0 }, isLoading: mealCountLoading, isError: mealCountError } = useQuery({
     queryKey: ['mealCount', email],
     queryFn: async () => {
-      const res = await axiosSecure.get(`/meals/count/${email}`); // Ensure this endpoint returns { count: number }
+      const res = await axiosSecure.get(`/meals/count?email=${email}`); // Ensure this endpoint returns { count: number }
       return res.data;
     },
     enabled: isAdmin && !!email && !userInfoLoading, // Only fetch if user is admin and email is available and userInfo is loaded
@@ -47,8 +47,9 @@ const ProfileSection = () => {
       </div>
     );
   }
-console.log('hii',user)
+console.log('hii',email)
   console.log(userInfo)
+  console.log(mealCountData)
 
   return (
     <div className="py-16 max-w-2xl mx-auto px-4"> {/* Consistent padding and max-width */}

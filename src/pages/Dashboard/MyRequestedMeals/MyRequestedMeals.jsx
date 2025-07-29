@@ -25,8 +25,8 @@ const MyRequestedMeals = () => {
     },
     enabled: !!user?.email && !authLoading, // Only fetch if user email is available and auth is not loading
   });
-console.log(user.email)
-console.log(requestedMeals)
+// console.log(user.email)
+// console.log(requestedMeals)
   // Sort meals: pending first, then delivered
   // This sort is done client-side to avoid needing backend indexes for sorting.
   const sortedMeals = [...requestedMeals].sort((a, b) => {
@@ -54,7 +54,7 @@ console.log(requestedMeals)
       });
     },
     onError: (mutationError) => {
-      console.error("Error canceling request:", mutationError);
+      // console.error("Error canceling request:", mutationError);
       MySwal.fire({
         icon: 'error',
         title: 'Error',
@@ -77,7 +77,7 @@ console.log(requestedMeals)
       confirmButtonText: 'Yes, cancel it!',
       cancelButtonText: 'No, keep it',
       customClass: {
-        confirmButton: 'bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors duration-200',
+        confirmButton: 'bg-red-600 text-white px-6 py-2 mr-4 rounded-lg hover:bg-red-700 transition-colors duration-200',
         cancelButton: 'bg-gray-300 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-200',
       },
       buttonsStyling: false,

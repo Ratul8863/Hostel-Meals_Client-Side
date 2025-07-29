@@ -60,7 +60,7 @@ const PaymentForm = () => {
           setClientSecret(res.data.clientSecret);
         })
         .catch((err) => {
-          console.error('Error creating payment intent:', err);
+          // console.error('Error creating payment intent:', err);
           setError('Failed to initialize payment. Please try again.');
         });
     }
@@ -73,7 +73,10 @@ const PaymentForm = () => {
         title: 'Already Purchased',
         text: `You already have the ${packageName} package.`,
         confirmButtonColor: '#3085d6',
-      }).then(() => navigate('/membership'));
+      }).then(() =>{
+         window.scrollTo(0, 0);
+navigate('/membership')
+      } );
     }
   }, [userInfo?.membership, packageName, navigate]);
 
@@ -132,18 +135,21 @@ const PaymentForm = () => {
           timer: 3000,
           showConfirmButton: false,
         }).then(() => {
+           window.scrollTo(0, 0);
           navigate('/dashboard/profile');
         });
       } catch (dbError) {
-        console.error('Error saving payment data or updating membership:', dbError);
+        // console.error('Error saving payment data or updating membership:', dbError);
         MySwal.fire({
           icon: 'error',
           title: 'Payment Recorded, but Error!',
           text: 'There was an issue updating your membership. Contact support.',
           html: `<strong>Transaction ID:</strong> <code>${paymentIntent.id}</code>`,
-        });
-        navigate('/dashboard');
-      }
+        }).then(() => {
+    window.scrollTo(0, 0);
+    navigate('/dashboard');
+  });
+}
     } else {
       setError(`Payment failed: ${paymentIntent.status}`);
     }
