@@ -40,6 +40,7 @@ const Navbar = () => {
             <li>
                 <NavLink
                     to="/"
+                    onClick={() => window.scrollTo(0, 0)}
                     className={({ isActive }) => 
                         `${navLinkBaseClasses} ${isActive ? navLinkActiveClass : 'text-gray-500'}` // Default text color is a subtle grey
                     }
@@ -52,6 +53,7 @@ const Navbar = () => {
             <li>
                 <NavLink
                     to="/meals"
+                    onClick={() => window.scrollTo(0, 0)}
                     className={({ isActive }) => 
                         `${navLinkBaseClasses} ${isActive ? navLinkActiveClass : 'text-gray-500'}`
                     }
@@ -63,6 +65,7 @@ const Navbar = () => {
             <li>
                 <NavLink
                     to="/UpcomingMealsUser"
+                    onClick={() => window.scrollTo(0, 0)}
                     className={({ isActive }) => 
                         `${navLinkBaseClasses} ${isActive ? navLinkActiveClass : 'text-gray-500'}`
                     }

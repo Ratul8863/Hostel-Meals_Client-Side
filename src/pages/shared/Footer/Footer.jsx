@@ -51,11 +51,11 @@ const Footer = () => {
         <div className="text-center md:text-left">
           <h3 className="text-xl font-semibold mb-6 text-white">Quick Links</h3> {/* Consistent heading style */}
           <ul className="space-y-3 text-base text-gray-400"> {/* Increased space-y for better readability */}
-            <li><Link to="/" className="hover:text-white transition-colors duration-200">Home</Link></li>
-            <li><Link to="/meals" className="hover:text-white transition-colors duration-200">Meals</Link></li>
-            <li><Link to="/UpcomingMealsUser" className="hover:text-white transition-colors duration-200">Upcoming Meals</Link></li>
-            <li><Link to="/dashboard" className="hover:text-white transition-colors duration-200">Dashboard</Link></li>
-            <li><Link to="/about-us" className="hover:text-white transition-colors duration-200">About Us</Link></li> {/* Added a generic About Us link */}
+            <li><Link onClick={() => window.scrollTo(0, 0)} to="/" className="hover:text-white transition-colors duration-200">Home</Link></li>
+            <li><Link onClick={() => window.scrollTo(0, 0)} to="/meals" className="hover:text-white transition-colors duration-200">Meals</Link></li>
+            <li><Link onClick={() => window.scrollTo(0, 0)} to="/UpcomingMealsUser" className="hover:text-white transition-colors duration-200">Upcoming Meals</Link></li>
+            <li><Link onClick={() => window.scrollTo(0, 0)} to="/dashboard" className="hover:text-white transition-colors duration-200">Dashboard</Link></li>
+            <li><Link onClick={() => window.scrollTo(0, 0)} to="/about-us" className="hover:text-white transition-colors duration-200">About Us</Link></li> {/* Added a generic About Us link */}
           </ul>
         </div>
 
@@ -63,10 +63,10 @@ const Footer = () => {
         <div className="text-center md:text-left">
           <h3 className="text-xl font-semibold mb-6 text-white">Popular Categories</h3> {/* Consistent heading style */}
           <ul className="space-y-3 text-base text-gray-400"> {/* Increased space-y */}
-            <li><Link to="/meals?category=breakfast" className="hover:text-white transition-colors duration-200">Breakfast</Link></li>
-            <li><Link to="/meals?category=lunch" className="hover:text-white transition-colors duration-200">Lunch</Link></li>
-            <li><Link to="/meals?category=dinner" className="hover:text-white transition-colors duration-200">Dinner</Link></li>
-            {/* <li><Link to="/meals?category=snacks" className="hover:text-white transition-colors duration-200">Snacks</Link></li> */}
+            <li><Link onClick={() => window.scrollTo(0, 0)} to="/meals?category=breakfast" className="hover:text-white transition-colors duration-200">Breakfast</Link></li>
+            <li><Link onClick={() => window.scrollTo(0, 0)} to="/meals?category=lunch" className="hover:text-white transition-colors duration-200">Lunch</Link></li>
+            <li><Link onClick={() => window.scrollTo(0, 0)} to="/meals?category=dinner" className="hover:text-white transition-colors duration-200">Dinner</Link></li>
+            {/* <li><Link onClick={() => window.scrollTo(0, 0)} to="/meals?category=snacks" className="hover:text-white transition-colors duration-200">Snacks</Link></li> */}
           </ul>
         </div>
 

@@ -212,6 +212,7 @@ const MealDetail = () => {
     distributorName,
     description,
     ingredients,
+    price,
     postTime,
     likes = 0,
     rating,
@@ -265,6 +266,12 @@ const MealDetail = () => {
                 <FaStar className="mr-2" />
                 {/* {typeof rating === 'number' ? rating.toFixed(1) : rating} */}
                 <span className="font-semibold text-gray-700">{typeof rating === 'number' ? rating.toFixed(1) : rating}</span>
+              </div>
+
+              <div>
+                <p className="text-xl font-bold text-primary-dark">
+                          ${meal.price.toFixed(2)}
+                        </p>
               </div>
             </div>
 

@@ -91,6 +91,7 @@ const MealsByCategory = () => {
                     <div className="flex justify-end mt-4">
                       <Link
                         to={`/meal/${meal._id}`}
+                        onClick={() => window.scrollTo(0, 0)}
                         className="inline-block px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-900 transition-colors duration-200 text-base"
                       >
                         View Details
