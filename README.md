@@ -1,91 +1,110 @@
 # 🏠 ProFast Hostel Management System
 
-A modern and feature-rich full-stack web application built to manage meals, users, reviews, premium subscriptions, and upcoming meal schedules in a hostel environment.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-635BFF?style=for-the-badge&logo=stripe&logoColor=white)
+![TanStack Query](https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+
+> A full-stack hostel meal and membership management platform with Stripe integration, admin control panel, premium user experience, and a modern UI.
+
+---
 
 ## 🔐 Admin Credentials
 
-- **Username/Email:** admin@hostel.com  
-- **Password:** 123456
-
-> These credentials are for demo/testing purposes only.
-
-## 🌐 Live Site
-
-**Frontend:** [https://profast-hostel.vercel.app](https://profast-hostel.vercel.app)  
-**Backend:** [https://profast-hostel-api.onrender.com](https://profast-hostel-api.onrender.com)  
+- **Email:** `ratulroy@gmail.com`  
+- **Password:** `ASDf123@`  
+> ✅ For demo and testing only. Use responsibly.
 
 ---
 
-## 🚀 Features
+## 🌐 Live Preview
 
-✅ **User Authentication** — Firebase login with secure JWT-based backend token verification.
-
-✅ **User & Admin Dashboards** — Role-based access with separate routes and dashboards for regular users and admins.
-
-✅ **Meals Management**  
-- Admins can add, update, and delete meal items.
-- Meals are categorized into **Breakfast**, **Lunch**, and **Dinner**.
-
-✅ **Upcoming Meals Section**  
-- Users can view upcoming meals and like them.
-- Likes are restricted to premium users only.
-- Admins can publish/unpublish upcoming meals.
-
-✅ **Like/Unlike Feature**  
-- Simple toggle system for likes.
-- Backend keeps track of `likedBy` list per meal.
-
-✅ **Meal Requests (Premium only)**  
-- Premium users can request meals.
-- Admins can approve or serve requested meals.
-
-✅ **Stripe Payment Integration**  
-- Users can subscribe to a premium plan through Stripe checkout.
-- Premium users get access to exclusive features.
-
-✅ **Dynamic Search**  
-- Search for users by email or username.
-- Server-side meal search across title, ingredients, and description using MongoDB indexing.
-
-✅ **User Reviews System**  
-- Users can post, edit, and delete reviews on meals.
-- Admin can view all reviews in the dashboard.
-
-✅ **Mobile-Responsive UI**  
-- Fully responsive design using Tailwind CSS and DaisyUI.
-- Clean and accessible layout with consistent modern styling.
+- **Frontend:** [hostel-management-by-ratul.web.app](https://hostel-management-by-ratul.web.app)  
+- **Backend API:** [hostel-management-server-nine.vercel.app](https://hostel-management-server-nine.vercel.app)
 
 ---
 
-## 🛠 Tech Stack
 
-- **Frontend:** React.js, React Router, Tailwind CSS, DaisyUI
-- **Backend:** Node.js, Express.js, MongoDB, Stripe
-- **Authentication:** Firebase Auth + JWT
-- **State Management & Fetching:** React Query (TanStack Query), Axios Secure
-- **Deployment:** Vercel (Frontend), Render (Backend)
+## 🚀 Key Features
+
+🔑 **Authentication & Authorization**
+- Firebase Auth + Secure JWT integration
+- Role-based dashboard navigation for `admin` and `user`
+
+🍛 **Meal Management**
+- Add/update/delete categorized meals: **Breakfast**, **Lunch**, **Dinner**
+- Meal detail pages with description, ingredients, likes, and reviews
+
+📆 **Upcoming Meals**
+- Users can preview next meals
+- Premium users can ❤️ like meals
+- Admins can toggle publish status
+
+💸 **Stripe Payment Integration**
+- Stripe Checkout to upgrade to premium membership
+- Payment success updates backend status
+
+⭐ **Premium Features**
+- Premium members can request meals
+- Access to like and interact with exclusive content
+
+📝 **Meal Reviews**
+- Users can write, edit, and delete reviews
+- Admins can monitor all reviews from dashboard
+
+🔎 **Smart Search**
+- Server-side user and meal search with filters
+- MongoDB indexing ensures fast lookups
+
+📈 **Real-Time Like System**
+- Toggle-based like/unlike system per meal
+- Backend tracks `likedBy` list for each item
+
+📱 **Fully Responsive UI**
+- Tailwind + DaisyUI design system
+- Clean mobile-first layout with toast alerts and modals
+
+🧑‍💼 **Admin Dashboard**
+- Manage all meals, users, reviews, and premium requests
+- Sortable tables and status controls
 
 ---
 
-## 📂 Folder Structure Highlights
+## 🛠 Tech Stack Overview
 
-- `/client` → React frontend (pages, components, hooks)
-- `/server` → Express backend (routes, controllers, database config)
-- `/public/coverageData.json` → Used for dynamic service center dropdowns
-
----
-
-## 🧪 Test Scenarios
-
-- ✅ Login with valid user → View Meals
-- ✅ Try to like an upcoming meal → Only works for premium users
-- ✅ Admin can update meal status → Confirmed via Toast/Alert
-- ✅ Stripe checkout → Redirects and verifies payment
-- ✅ Unauthorized access to dashboard routes → Redirect to login
+| Layer         | Technologies |
+|---------------|--------------|
+| **Frontend**  | React.js, React Router, Tailwind CSS, DaisyUI |
+| **Backend**   | Node.js, Express.js, MongoDB |
+| **Auth**      | Firebase Auth + JWT |
+| **Payment**   | Stripe Integration |
+| **Fetching**  | Axios + [TanStack Query](https://tanstack.com/query/latest) |
+| **Deployment**| Vercel (Client) & Render (API Server) |
 
 ---
 
-## 👨‍💻 Author
 
-Made with 💙 by **Ratul Roy**  
-🌍 Bangladesh | 🛠 MERN Stack Developer  
+## 🧪 Suggested Test Scenarios
+
+✅ Login as user → View meals, reviews  
+✅ Attempt to like a meal without premium → Blocked  
+✅ Upgrade via Stripe → Success and updated membership  
+✅ Navigate to Admin Dashboard → Add meal, manage users  
+✅ Check upcoming meals → Like as premium, admin publish/unpublish  
+✅ Unauthorized route access → Auto-redirect to login
+
+---
+
+## 🙋‍♂️ Author
+
+**Ratul Roy**  
+🇧🇩 Bangladesh | 🔧 MERN Stack Developer  
+📫 [LinkedIn](https://linkedin.com) | 💼 Portfolio (Coming Soon)
+
+---
+
+> 🚨 This is a practice/assignment project and not intended for production use. Feel free to fork and explore!
+
+
