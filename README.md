@@ -1,4 +1,4 @@
-# 🏠 ProFast Hostel Management System
+# 🏠Hostel Meals - Hostel's Meal Management System
 
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
@@ -81,7 +81,7 @@
 | **Auth**      | Firebase Auth + JWT |
 | **Payment**   | Stripe Integration |
 | **Fetching**  | Axios + [TanStack Query](https://tanstack.com/query/latest) |
-| **Deployment**| Vercel (Client) & Render (API Server) |
+| **Deployment**| Firebase (Client) & Vercel (API Server) |
 
 ---
 
@@ -99,9 +99,9 @@
 
 ## 🙋‍♂️ Author
 
-**Ratul Roy**  
+**Ratul Saha Roy**  
 🇧🇩 Bangladesh | 🔧 MERN Stack Developer  
-📫 [LinkedIn](https://linkedin.com) | 💼 Portfolio (Coming Soon)
+📫 [LinkedIn](https://www.linkedin.com/in/ratul-saha-roy/) | 💼 Portfolio (https://ratul-saha-roy.web.app/)
 
 ---
 
