@@ -36,6 +36,7 @@ import MyReviews from "../pages/Dashboard/MyReviews/MyReviews";
 import AllReviews from "../pages/Dashboard/AllReviews/AllReviews";
 import RiderRoute from "../routes/RiderRoute";
 import ErrorPage from "../pages/shared/ErrorPage/ErrorPage";
+import ApplyPage from "../pages/Home/Join Our Team/ApplyPage";
 
 export const router = createBrowserRouter([
   {
@@ -60,7 +61,10 @@ export const router = createBrowserRouter([
         path: 'meals',
         Component: MealsPage
       },
-
+ {
+        path: '/apply-for-team',
+        Component: ApplyPage
+      },
 
        {
         path: 'UpcomingMealsUser',
