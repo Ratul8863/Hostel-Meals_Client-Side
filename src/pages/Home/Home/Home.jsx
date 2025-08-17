@@ -12,6 +12,8 @@ import TopRatedMeals from '../TopRatedMeals/TopRatedMeals';
 import MeetOurTeam from '../MeetOurTeam/MeetOurTeam';
 import { Helmet } from 'react-helmet-async';
 import JoinOurTeamSection from '../Join Our Team/JoinOurTeamSection';
+import UserBenefits from '../UserBenefits/UserBenefits';
+import HowItWorksSection from '../HowItWorksSection/HowItWorksSection';
 
 const Home = () => {
     return (
@@ -26,7 +28,9 @@ const Home = () => {
             <MealsByCategory></MealsByCategory>
             <MembershipSection></MembershipSection>
             <CustomerTestimonials></CustomerTestimonials>
-            <TopRatedMeals></TopRatedMeals>
+            {/* <TopRatedMeals></TopRatedMeals> */}
+            <UserBenefits></UserBenefits>
+            <HowItWorksSection></HowItWorksSection>
             <JoinOurTeamSection></JoinOurTeamSection>
             <MeetOurTeam></MeetOurTeam>
             

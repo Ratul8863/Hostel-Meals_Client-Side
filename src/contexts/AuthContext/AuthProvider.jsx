@@ -45,6 +45,25 @@ const AuthProvider = ({ children }) => {
         }
     }, [])
 
+
+    // Dark and light mode theme 
+    const [theme, setTheme] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") || "light";
+    }
+    return "light";
+  });
+
+  // Apply theme to <html> tag
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
     const authInfo = {
         user,
         loading,
@@ -52,7 +71,9 @@ const AuthProvider = ({ children }) => {
         signIn,
         signInWithGoogle,
         updateUserProfile,
-        logOut
+        logOut,
+        setTheme,
+        theme
     }
 
     return (
