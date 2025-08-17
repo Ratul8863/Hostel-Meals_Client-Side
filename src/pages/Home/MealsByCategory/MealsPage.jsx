@@ -2,57 +2,51 @@ import React, { useState, useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom'; // Ensure Link is from react-router-dom
-import { FaStar } from 'react-icons/fa'; // For meal ratings
+import { Link } from 'react-router-dom';
+import { FaStar } from 'react-icons/fa';
 import { Helmet } from 'react-helmet-async';
+import useAuth from '../../../hooks/useAuth';
 
-const categories = ['Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Desserts']; // Extended categories for example
+const categories = ['Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Desserts'];
 
 const MealsPage = () => {
   const axiosSecure = useAxiosSecure();
-  
+  const { theme } = useAuth();
+
   const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState(''); // Renamed to selectedCategory for consistency
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [debouncedCategory, setDebouncedCategory] = useState('');
   const [debouncedPriceRange, setDebouncedPriceRange] = useState(priceRange);
 
-  // Debounce search, category, and price range to avoid excessive API calls
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500); // 500ms debounce
+    const handler = setTimeout(() => setDebouncedSearch(search), 500);
     return () => clearTimeout(handler);
   }, [search]);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedCategory(selectedCategory);
-    }, 500);
+    const handler = setTimeout(() => setDebouncedCategory(selectedCategory), 500);
     return () => clearTimeout(handler);
   }, [selectedCategory]);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedPriceRange(priceRange);
-    }, 500);
+    const handler = setTimeout(() => setDebouncedPriceRange(priceRange), 500);
     return () => clearTimeout(handler);
   }, [priceRange]);
-
 
   const fetchMeals = async ({ pageParam = 1 }) => {
     const res = await axiosSecure.get(`/meals`, {
       params: {
         page: pageParam,
-        limit: 8, // Increased limit for better infinite scroll experience
+        limit: 8,
         search: debouncedSearch,
         category: debouncedCategory,
         minPrice: debouncedPriceRange.min,
         maxPrice: debouncedPriceRange.max,
       },
     });
-    return res.data; // response is { meals: [], totalCount: number }
+    return res.data;
   };
 
   const {
@@ -60,48 +54,52 @@ const MealsPage = () => {
     fetchNextPage,
     hasNextPage,
     isLoading,
-    isFetchingNextPage, // To differentiate initial loading from fetching more
+    isFetchingNextPage,
     isError,
   } = useInfiniteQuery({
     queryKey: ['meals', debouncedSearch, debouncedCategory, debouncedPriceRange],
     queryFn: fetchMeals,
     getNextPageParam: (lastPage, allPages) => {
-      // Assuming lastPage.meals.length gives the number of meals in the *current* fetched page
-      // And lastPage.totalCount gives the total number of meals available on the server for current filters
       const totalFetchedMeals = allPages.flatMap((page) => page.meals).length;
-      if (totalFetchedMeals < lastPage.totalCount) {
-        return allPages.length + 1; // Request next page
-      }
-      return undefined; // No more pages
+      return totalFetchedMeals < lastPage.totalCount ? allPages.length + 1 : undefined;
     },
     initialPageParam: 1,
   });
 
   const meals = data?.pages.flatMap((page) => page.meals) || [];
 
-  return (
-    <div className="py-16 max-w-7xl mx-auto px-4"> {/* Consistent padding and max-width */}
- <Helmet>
-              <title>Hostel Meals | Meals</title>
-            </Helmet>
+  // --- THEME COLORS ---
+  const colors = {
+    bg: theme === 'dark' ? 'bg-[#0D1128]' : 'bg-gray-50',
+    text: theme === 'dark' ? 'text-white' : 'text-gray-900',
+    cardBg: theme === 'dark' ? 'bg-[#1c1f3b]' : 'bg-white',
+    border: theme === 'dark' ? 'border-gray-700' : 'border-gray-200',
+    inputBg: theme === 'dark' ? 'bg-[#0D1128] text-white placeholder-gray-400 border-gray-700' : 'bg-white text-gray-800 placeholder-gray-500 border-gray-300',
+    buttonBg: theme === 'dark' ? 'bg-primary-dark text-white hover:bg-primary-light' : 'bg-gray-800 text-white hover:bg-gray-900',
+  };
 
-      <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800">
+  return (
+    <div className={`py-16 max-w-7xl mx-auto px-4 ${colors.bg} ${colors.text}`}>
+      <Helmet>
+        <title>Hostel Meals | Meals</title>
+      </Helmet>
+
+      <h2 className={`text-4xl md:text-5xl font-extrabold mb-12 text-center ${colors.text}`}>
         All Delicious Meals
       </h2>
 
       <div className="flex flex-col lg:flex-row gap-8 mb-12">
-        {/* Filter and Search Sidebar/Section */}
-        <div className="lg:w-1/4 bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <h3 className="text-2xl font-bold text-gray-800 mb-6">Filter Meals</h3>
+        {/* Filter Sidebar */}
+        <div className={`lg:w-1/4 rounded-xl shadow-lg p-6 border ${colors.border} ${colors.cardBg}`}>
+          <h3 className={`text-2xl font-bold mb-6 ${colors.text}`}>Filter Meals</h3>
 
           {/* Search Input */}
           <div className="mb-6">
-            <label htmlFor="search-input" className="block text-gray-700 text-sm font-medium mb-2">Search by Name</label>
+            <label className={`block text-sm font-medium mb-2 ${colors.text}`}>Search by Name</label>
             <input
-              id="search-input"
               type="text"
               placeholder="e.g., Chicken Curry"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200"
+              className={`w-full px-4 py-3 rounded-lg ring-2 ring-primary-light transition-colors duration-200 ${colors.inputBg}`}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -109,10 +107,9 @@ const MealsPage = () => {
 
           {/* Category Filter */}
           <div className="mb-6">
-            <label htmlFor="category-select" className="block text-gray-700 text-sm font-medium mb-2">Filter by Category</label>
+            <label className={`block text-sm font-medium mb-2 ${colors.text}`}>Filter by Category</label>
             <select
-              id="category-select"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-light appearance-none transition-colors duration-200"
+              className={`w-full px-4 py-3 rounded-lg ring-2 ring-primary-light appearance-none transition-colors duration-200 ${colors.inputBg}`}
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
             >
@@ -123,54 +120,54 @@ const MealsPage = () => {
             </select>
           </div>
 
-          {/* Price Range Filter */}
+          {/* Price Range */}
           <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-medium mb-2">Filter by Price Range</label>
+            <label className={`block text-sm font-medium mb-2 ${colors.text}`}>Filter by Price Range(from $1)</label>
             <div className="flex items-center gap-2">
               <input
                 type="number"
                 placeholder="Min"
-                className="w-1/2 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200"
-                value={priceRange.min === 0 ? '' : priceRange.min} // Empty string for 0 to show placeholder
-                onChange={(e) => setPriceRange((prev) => ({ ...prev, min: Number(e.target.value) || 0 }))}
+                className={`w-1/2 px-4 py-3 rounded-lg ring-2 ring-primary-light transition-colors duration-200 ${colors.inputBg}`}
+                value={priceRange.min === 0 ? '' : priceRange.min}
+                onChange={(e) => setPriceRange(prev => ({ ...prev, min: Number(e.target.value) || 0 }))}
               />
-              <span className="text-gray-500">-</span>
+              <span className={`text-gray-500 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>-</span>
               <input
                 type="number"
                 placeholder="Max"
-                className="w-1/2 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200"
-                value={priceRange.max === 10000 ? '' : priceRange.max} // Empty string for default max
-                onChange={(e) => setPriceRange((prev) => ({ ...prev, max: Number(e.target.value) || 10000 }))}
+                className={`w-1/2 px-4 py-3 rounded-lg ring-2 ring-primary-light transition-colors duration-200 ${colors.inputBg}`}
+                value={priceRange.max === 10000 ? '' : priceRange.max}
+                onChange={(e) => setPriceRange(prev => ({ ...prev, max: Number(e.target.value) || 10000 }))}
               />
             </div>
           </div>
         </div>
 
-        {/* Meals Display Area */}
+        {/* Meals Grid */}
         <div className="lg:w-3/4">
-          {isLoading && !isFetchingNextPage ? ( // Show initial loading state
-            <p className="text-center text-gray-600 text-xl">Loading delicious meals...</p>
+          {isLoading && !isFetchingNextPage ? (
+            <p className={`text-center text-xl ${colors.text}`}>Loading delicious meals...</p>
           ) : isError ? (
-            <p className="text-center text-red-600 text-xl">Failed to load meals. Please try again later.</p>
+            <p className="text-center text-red-600 text-xl">Failed to load meals.</p>
           ) : meals.length === 0 ? (
-            <p className="text-center text-gray-600 text-xl">No meals found matching your criteria.</p>
+            <p className={`text-center text-xl ${colors.text}`}>No meals found matching your criteria.</p>
           ) : (
             <InfiniteScroll
               dataLength={meals.length}
               next={fetchNextPage}
               hasMore={hasNextPage}
-              loader={<h4 className="text-center my-8 text-gray-600">Loading more meals...</h4>}
+              loader={<h4 className={`text-center my-8 ${colors.text}`}>Loading more meals...</h4>}
               endMessage={
-                <p className="text-center my-8 text-gray-500">
+                <p className={`text-center my-8 ${colors.text}`}>
                   <b>You've seen all the meals!</b>
                 </p>
               }
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" // Consistent grid styling
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
             >
               {meals.map((meal) => (
                 <div
                   key={meal._id}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl border border-gray-100 flex flex-col" // Polished card style
+                  className={`rounded-xl shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl border ${colors.border} ${colors.cardBg} flex flex-col`}
                 >
                   <figure className="relative h-60 w-full overflow-hidden">
                     <img
@@ -179,28 +176,25 @@ const MealsPage = () => {
                       className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
                     />
                   </figure>
-                  <div className="p-6 flex-grow flex flex-col"> {/* Added flex-grow and flex-col for consistent height */}
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">{meal.title}</h2>
-                    <p className="text-gray-600 mb-4 text-base flex-grow">{meal.description?.slice(0, 80)}...</p> {/* flex-grow for description */}
+                  <div className="p-6 flex-grow flex flex-col">
+                    <h2 className={`text-2xl font-bold mb-2 ${colors.text}`}>{meal.title}</h2>
+                    <p className={`mb-4 text-base flex-grow ${colors.text}`}>{meal.description?.slice(0, 80)}...</p>
 
                     <div className="flex items-center justify-between mb-4">
-                     
-                        <div className="flex items-center text-yellow-500">
-                          <FaStar className="mr-1" />
-                          <span className="font-semibold text-gray-700">4.3</span>
-                        </div>
-                     
+                      <div className="flex items-center text-yellow-500">
+                        <FaStar className="mr-1" />
+                        <span className={`font-semibold ${colors.text}`}>4.3</span>
+                      </div>
                       {meal.price && (
-                        <p className="text-xl font-bold text-primary-dark">
-                          ${meal.price.toFixed(2)}
-                        </p>
+                        <p className="text-xl font-bold text-primary-dark">${meal.price.toFixed(2)}</p>
                       )}
                     </div>
 
                     <div className="flex justify-end mt-4">
                       <Link
                         to={`/meal/${meal._id}`}
-                        className="inline-block px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-900 transition-colors duration-200 text-base"
+                        onClick={() => window.scrollTo(0, 0)}
+                      className="inline-block px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-900 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-gray-300 transition-colors duration-200 text-base"
                       >
                         View Details
                       </Link>
