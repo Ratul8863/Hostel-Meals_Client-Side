@@ -63,9 +63,10 @@ const Footer = () => {
         <div className="text-center md:text-left">
           <h3 className="text-xl font-semibold mb-6 text-white">Popular Categories</h3> {/* Consistent heading style */}
           <ul className="space-y-3 text-base text-gray-400"> {/* Increased space-y */}
-            <li><Link onClick={() => window.scrollTo(0, 0)} to="/meals?category=breakfast" className="hover:text-white transition-colors duration-200">Breakfast</Link></li>
+            <li><Link onClick={() => window.scrollTo(0, 0)} to="/meals" className="hover:text-white transition-colors duration-200">Explore Meals</Link></li>
+            {/* <li><Link onClick={() => window.scrollTo(0, 0)} to="/meals?category=breakfast" className="hover:text-white transition-colors duration-200">Breakfast</Link></li>
             <li><Link onClick={() => window.scrollTo(0, 0)} to="/meals?category=lunch" className="hover:text-white transition-colors duration-200">Lunch</Link></li>
-            <li><Link onClick={() => window.scrollTo(0, 0)} to="/meals?category=dinner" className="hover:text-white transition-colors duration-200">Dinner</Link></li>
+            <li><Link onClick={() => window.scrollTo(0, 0)} to="/meals?category=dinner" className="hover:text-white transition-colors duration-200">Dinner</Link></li> */}
             {/* <li><Link onClick={() => window.scrollTo(0, 0)} to="/meals?category=snacks" className="hover:text-white transition-colors duration-200">Snacks</Link></li> */}
           </ul>
         </div>
@@ -73,19 +74,19 @@ const Footer = () => {
         {/* Newsletter */}
         <div className="text-center md:text-left">
           <h3 className="text-xl font-semibold mb-6 text-white">Stay Connected</h3> {/* More inviting heading */}
-          <p className="text-base text-gray-400 mb-6">Subscribe to our newsletter for the latest meal updates, exclusive offers, and more!</p>
+          <p className="text-base text-gray-400 mb-6">Get the membership for the latest meal updates, exclusive offers, and more!</p>
           <form className="flex flex-col gap-4"> {/* Increased gap for form elements */}
-            <input
+            {/* <input
               type="email"
               placeholder="Your email address"
               className="px-5 py-3 rounded-lg bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-light border border-gray-700 transition-colors duration-200" // Polished input style
-            />
-            <button
+            /> */}
+            {/* <button
               type="submit"
               className="w-full px-8 py-3 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 transition-colors duration-200 text-lg border border-gray-700" // Button style consistent with other CTAs
             >
               Subscribe
-            </button>
+            </button> */}
           </form>
         </div>
       </div>

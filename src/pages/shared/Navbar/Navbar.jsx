@@ -87,7 +87,7 @@ const Navbar = () => {
         </NavLink>
       </li>
       {/* Notification Bell */}
-      <li>
+      {/* <li>
         <button
           className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
           aria-label="Notifications"
@@ -97,7 +97,7 @@ const Navbar = () => {
             <span className="absolute -top-1 -right-1.5 h-2 w-2 bg-red-500 rounded-full"></span>
           </span>
         </button>
-      </li>
+      </li> */}
       {/* Theme Toggle for Mobile */}
       <li>
         <button
