@@ -195,11 +195,11 @@ const UpcomingMeals = () => {
   }
 
   return (
-    <div className="py-16 max-w-7xl mx-auto px-4">
-      <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800">
+    <div className="py-16 max-w-7xl mx-auto px-4 text-gray-900 dark:text-white">
+      <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center text-gray-800 dark:text-gray-100">
         Manage Upcoming Meals
       </h2>
-      <p className="text-center text-lg md:text-xl text-gray-600 mb-16 max-w-3xl mx-auto">
+      <p className="text-center text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-16 max-w-3xl mx-auto">
         Oversee meals planned for future publication. Publish them to make them available to all users.
       </p>
 
@@ -213,55 +213,55 @@ const UpcomingMeals = () => {
       </div>
 
       {upcomingMeals.length === 0 ? (
-        <p className="text-center text-gray-600 text-xl py-10">No upcoming meals to display at the moment.</p>
+        <p className="text-center text-gray-800 dark:text-gray-100 text-xl py-10">No upcoming meals to display at the moment.</p>
       ) : (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 p-6 md:p-8">
+        <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg overflow-hidden  p-6 md:p-8">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y  divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-700 ">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider rounded-tl-lg">
                     #
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Image
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     <span className="flex items-center gap-2"><FaUtensils /> Title</span>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     <span className="flex items-center gap-2"><FaListAlt /> Category</span>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     <span className="flex items-center gap-2"><FaHeart /> Likes</span>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     <span className="flex items-center gap-2"><FaUser /> Added By</span>
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider rounded-tr-lg">
                     Action
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className=" divide-y divide-gray-200 bg-white dark:bg-gray-800">
                 {paginatedMeals.map((meal, index) => (
-                  <tr key={meal._id} className="hover:bg-gray-50 transition-colors duration-150">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr key={meal._id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-200">
                       {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                     </td>
                     <td className=" py-4 whitespace-nowrap">
                       <img src={meal.image || 'https://placehold.co/64x64?text=Meal'} className="w-16 h-16 object-cover rounded-lg border border-gray-200" alt={meal.title} />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
                       {meal.title}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 capitalize">
                       {meal.category}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       {meal.likes || 0}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                       {meal.distributorName || meal.addedBy || 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -282,7 +282,7 @@ const UpcomingMeals = () => {
           {totalPages >= 1 && (
             <div className="flex justify-center items-center mt-8 space-x-2">
               <button
-                className="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={currentPage === 1}
                 onClick={() => goToPage(currentPage - 1)}
               >
@@ -294,8 +294,8 @@ const UpcomingMeals = () => {
                   key={i}
                   className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200
                     ${currentPage === i + 1
-                      ? "bg-gray-800 text-white shadow-md"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-gray-800 dark:bg-gray-100 text-white dark:text-gray-800 shadow-md"
+                      : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
                     }`}
                   onClick={() => goToPage(i + 1)}
                 >
@@ -316,139 +316,154 @@ const UpcomingMeals = () => {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg relative transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-bold text-gray-800 mb-6 text-center">Add New Upcoming Meal</h3>
+  <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-8 w-full max-w-lg relative transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto">
+      
+      {/* Title */}
+      <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
+        Add New Upcoming Meal
+      </h3>
 
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors duration-200"
-              title="Close"
-            >
-              <FaTimes className="text-2xl" />
-            </button>
+      {/* Close button */}
+      <button
+        onClick={() => setIsModalOpen(false)}
+        className="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200"
+        title="Close"
+      >
+        <FaTimes className="text-2xl" />
+      </button>
 
-            <form onSubmit={handleSubmit(handleAddMealSubmit)} className="space-y-6">
-              <div>
-                <label htmlFor="modal-title" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
-                  <FaUtensils /> Meal Title
-                </label>
-                <input
-                  id="modal-title"
-                  type="text"
-                  placeholder="e.g., Spicy Lentil Soup"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200"
-                  {...register("title", { required: "Meal title is required" })}
-                />
-                {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="modal-category" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
-                  <FaListAlt /> Category
-                </label>
-                <select
-                  id="modal-category"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-light appearance-none transition-colors duration-200"
-                  {...register("category", { required: "Category is required" })}
-                >
-                  <option value="">Select Category</option>
-                  <option value="Breakfast">Breakfast</option>
-                  <option value="Lunch">Lunch</option>
-                  <option value="Dinner">Dinner</option>
-                  <option value="Snacks">Snacks</option>
-                  <option value="Desserts">Desserts</option>
-                </select>
-                {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="modal-price" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
-                  <FaDollarSign /> Price ($)
-                </label>
-                <input
-                  id="modal-price"
-                  type="number"
-                  placeholder="e.g., 8.50"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200"
-                  step="0.01"
-                  {...register("price", {
-                    required: "Price is required",
-                    min: { value: 0, message: "Price cannot be negative" },
-                    pattern: { value: /^\d+(\.\d{1,2})?$/, message: "Invalid price format" }
-                  })}
-                />
-                {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="modal-ingredients" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
-                  <FaPencilAlt /> Ingredients (comma-separated)
-                </label>
-                <textarea
-                  id="modal-ingredients"
-                  placeholder="e.g., Lentils, Carrots, Spinach, Garlic"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200 resize-y"
-                  rows={3}
-                  {...register("ingredients", { required: "Ingredients are required" })}
-                ></textarea>
-                {errors.ingredients && <p className="text-red-500 text-sm mt-1">{errors.ingredients.message}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="modal-description" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
-                  <FaPencilAlt /> Description
-                </label>
-                <textarea
-                  id="modal-description"
-                  placeholder="A hearty and nutritious soup..."
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-light text-gray-800 transition-colors duration-200 resize-y"
-                  rows={4}
-                  {...register("description", { required: "Description is required" })}
-                ></textarea>
-                {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="modal-image" className=" text-gray-700 text-sm font-semibold mb-2 flex items-center gap-2">
-                  <FaImage /> Meal Image
-                </label>
-                <input
-                  id="modal-image"
-                  type="file"
-                  accept="image/*"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-white hover:file:bg-primary-dark transition-colors duration-200 cursor-pointer"
-                  {...register("image", { required: "Meal image is required" })}
-                />
-                {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>}
-                {imagePreview && (
-                  <div className="mt-4 flex justify-center">
-                    <img src={imagePreview} alt="Meal Preview" className="max-h-48 rounded-lg shadow-md border border-gray-200 object-cover" />
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-6 py-3 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors duration-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className={`px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-900 transition-colors duration-200
-                    ${addUpcomingMealMutation.isPending ? 'opacity-70 cursor-not-allowed' : ''}`}
-                  disabled={addUpcomingMealMutation.isPending}
-                >
-                  {addUpcomingMealMutation.isPending ? 'Adding Meal...' : 'Add Meal'}
-                </button>
-              </div>
-            </form>
-          </div>
+      {/* Form */}
+      <form onSubmit={handleSubmit(handleAddMealSubmit)} className="space-y-6">
+        {/* Title */}
+        <div>
+          <label htmlFor="modal-title" className="text-gray-900 dark:text-gray-100 text-sm font-semibold mb-2 flex items-center gap-2">
+            <FaUtensils /> Meal Title
+          </label>
+          <input
+            id="modal-title"
+            type="text"
+            placeholder="e.g., Spicy Lentil Soup"
+            className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-light transition-colors duration-200"
+            {...register("title", { required: "Meal title is required" })}
+          />
+          {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
         </div>
-      )}
+
+        {/* Category */}
+        <div>
+          <label htmlFor="modal-category" className="text-gray-900 dark:text-gray-100 text-sm font-semibold mb-2 flex items-center gap-2">
+            <FaListAlt /> Category
+          </label>
+          <select
+            id="modal-category"
+            className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-light transition-colors duration-200"
+            {...register("category", { required: "Category is required" })}
+          >
+            <option value="">Select Category</option>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Dinner">Dinner</option>
+            <option value="Snacks">Snacks</option>
+            <option value="Desserts">Desserts</option>
+          </select>
+          {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
+        </div>
+
+        {/* Price */}
+        <div>
+          <label htmlFor="modal-price" className="text-gray-900 dark:text-gray-100 text-sm font-semibold mb-2 flex items-center gap-2">
+            <FaDollarSign /> Price ($)
+          </label>
+          <input
+            id="modal-price"
+            type="number"
+            placeholder="e.g., 8.50"
+            className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-light transition-colors duration-200"
+            step="0.01"
+            {...register("price", {
+              required: "Price is required",
+              min: { value: 0, message: "Price cannot be negative" },
+              pattern: { value: /^\d+(\.\d{1,2})?$/, message: "Invalid price format" }
+            })}
+          />
+          {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
+        </div>
+
+        {/* Ingredients */}
+        <div>
+          <label htmlFor="modal-ingredients" className="text-gray-900 dark:text-gray-100 text-sm font-semibold mb-2 flex items-center gap-2">
+            <FaPencilAlt /> Ingredients (comma-separated)
+          </label>
+          <textarea
+            id="modal-ingredients"
+            placeholder="e.g., Lentils, Carrots, Spinach, Garlic"
+            className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-light transition-colors duration-200 resize-y"
+            rows={3}
+            {...register("ingredients", { required: "Ingredients are required" })}
+          ></textarea>
+          {errors.ingredients && <p className="text-red-500 text-sm mt-1">{errors.ingredients.message}</p>}
+        </div>
+
+        {/* Description */}
+        <div>
+          <label htmlFor="modal-description" className="text-gray-900 dark:text-gray-100 text-sm font-semibold mb-2 flex items-center gap-2">
+            <FaPencilAlt /> Description
+          </label>
+          <textarea
+            id="modal-description"
+            placeholder="A hearty and nutritious soup..."
+            className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-light transition-colors duration-200 resize-y"
+            rows={4}
+            {...register("description", { required: "Description is required" })}
+          ></textarea>
+          {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
+        </div>
+
+        {/* Image Upload */}
+        <div>
+          <label htmlFor="modal-image" className="text-gray-900 dark:text-gray-100 text-sm font-semibold mb-2 flex items-center gap-2">
+            <FaImage /> Meal Image
+          </label>
+          <input
+            id="modal-image"
+            type="file"
+            accept="image/*"
+            className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-light file:text-white hover:file:bg-primary-dark transition-colors duration-200 cursor-pointer"
+            {...register("image", { required: "Meal image is required" })}
+          />
+          {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image.message}</p>}
+          {imagePreview && (
+            <div className="mt-4 flex justify-center">
+              <img src={imagePreview} alt="Meal Preview" className="max-h-48 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 object-cover" />
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-3 mt-6">
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(false)}
+            className="px-6 py-3 rounded-lg bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className={`px-6 py-3 bg-primary-light hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors duration-200 ${
+              addUpcomingMealMutation.isPending ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
+            disabled={addUpcomingMealMutation.isPending}
+          >
+            {addUpcomingMealMutation.isPending ? 'Adding Meal...' : 'Add Meal'}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
