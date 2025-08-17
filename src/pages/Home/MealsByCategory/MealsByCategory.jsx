@@ -69,7 +69,7 @@ const MealsByCategory = () => {
                     />
                   </figure>
                   <div className="p-6">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">{meal.title}</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-2  md:h-20">{meal.title}</h2>
                     <p className="text-gray-600 mb-4 text-base">{meal.description?.slice(0, 80)}...</p>
 
                     <div className="flex items-center justify-between mb-4">

@@ -90,7 +90,7 @@ const Navbar = () => {
     return (
         // Main Navbar container with a subtle shadow and bottom border for a clean separation
         // Added sticky, top-0, and z-50 for sticky behavior
-        <div className="navbar bg-white shadow-sm px-6 py-3 border-b border-gray-100 sticky top-0 z-50">
+        <div className="navbar bg-white shadow-sm md:px-28 px-4 py-3 border-b border-gray-100 sticky top-0 z-50 ">
             {/* Navbar Start Section (Logo and Mobile Dropdown) */}
             <div className="navbar-start">
                 {/* Mobile Dropdown Menu (Hamburger Icon) */}
@@ -113,7 +113,7 @@ const Navbar = () => {
             </div>
 
             {/* Navbar Center Section (Desktop Navigation Links) */}
-            <div className="navbar-center hidden lg:flex">
+            <div className="navbar-center hidden  lg:flex">
                 <ul className="menu menu-horizontal px-1 gap-x-8"> {/* Increased gap for more spacing between links */}
                     {navItems}
                 </ul>
