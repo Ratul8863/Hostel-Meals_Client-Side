@@ -7,14 +7,17 @@ import {
   FaUtensils,
   FaUserCircle,
   FaEnvelope,
+  FaUserShield,
 } from "react-icons/fa";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
+import useAuth from "../../../hooks/useAuth";
 
 const MySwal = withReactContent(Swal);
 const ITEMS_PER_PAGE = 10;
 
 const RequestedMeals = () => {
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,7 +69,10 @@ const RequestedMeals = () => {
     if (!confirmResult.isConfirmed) return;
 
     try {
-      await axiosSecure.patch(`/meals/${id}/status`, { status: "delivered" });
+      await axiosSecure.patch(`/meals/${id}/status`, {
+        status: "delivered",
+        email: user?.email, // <-- send servedBy
+      });
       await refetch();
       MySwal.fire({
         icon: "success",
@@ -169,6 +175,7 @@ const RequestedMeals = () => {
                       <FaEnvelope /> User Email
                     </span>
                   </th>
+                 
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Status
                   </th>
@@ -195,6 +202,7 @@ const RequestedMeals = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       {meal.userEmail || "N/A"}
                     </td>
+                    
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${

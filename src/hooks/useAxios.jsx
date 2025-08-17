@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-    baseURL: `https://hostel-management-server-nine.vercel.app/`
+    baseURL: `http://localhost:8000/`
 })
 
 const useAxios = () => {
@@ -9,3 +9,5 @@ const useAxios = () => {
 };
 
 export default useAxios;
+
+// https://hostel-management-server-nine.vercel.app/

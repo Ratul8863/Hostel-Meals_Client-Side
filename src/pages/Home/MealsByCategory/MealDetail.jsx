@@ -140,12 +140,13 @@ const MealDetail = () => {
 
     try {
       await axiosSecure.post('/meal-request', {
-        mealId: id,
-        mealTitle: meal.title,
-        userEmail: user.email,
-        userName: user.displayName,
-        status: 'pending'
-      });
+  mealId: id,
+  mealTitle: meal.title,
+  userEmail: user.email,
+  userName: user.displayName,
+  status: 'pending',
+  requestTime: new Date()
+});
 
       MySwal.fire('Requested!', 'Meal request submitted successfully. Check your dashboard for status.', 'success');
     } catch (err) {

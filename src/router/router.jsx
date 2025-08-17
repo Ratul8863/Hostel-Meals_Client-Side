@@ -106,9 +106,12 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
+        Component: DashboardHome
+      },
+       {
+        path: '/dashboard/profile',
         Component: ProfileSection
       },
-      
       {
         path: 'payment/:parcelId',
         Component: Payment

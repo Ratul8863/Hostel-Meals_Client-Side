@@ -4,8 +4,11 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import useAuth from './useAuth';
 
+// https://hostel-management-server-nine.vercel.app/
+
+
 const axiosSecure = axios.create({
-    baseURL: `https://hostel-management-server-nine.vercel.app/`
+    baseURL: `http://localhost:8000/`
 });
 
 const useAxiosSecure = () => {

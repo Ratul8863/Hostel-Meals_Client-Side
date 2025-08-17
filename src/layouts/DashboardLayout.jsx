@@ -4,7 +4,8 @@ import ProFastLogo from '../pages/shared/ProFastLogo/ProFastLogo';
 import { 
     FaHome, FaBoxOpen, FaMoneyCheckAlt, FaUserEdit, FaSearchLocation, 
     FaUserCheck, FaUserClock, FaUserShield, FaTasks, FaWallet, FaUtensils, 
-    FaClipboardList, FaFileInvoiceDollar, FaChartLine, FaMotorcycle, FaCheckCircle 
+    FaClipboardList, FaFileInvoiceDollar, FaChartLine, FaMotorcycle, FaCheckCircle, 
+    FaUser
 } from 'react-icons/fa';
 import { MdOutlineLightMode, MdOutlineDarkMode } from 'react-icons/md';
 import useUserRole from '../hooks/useUserRole';
@@ -94,12 +95,19 @@ const DashboardLayout = () => {
                     </li>
 
                     {/* Common Links */}
-                    <li>
+                     <li>
                         <NavLink to="/dashboard" className={sidebarNavLinkClasses} onClick={closeDrawer}>
+                            <FaUser className="inline-block mr-3 text-xl" />
+                           Dashboard
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink to="/dashboard/profile" className={sidebarNavLinkClasses} onClick={closeDrawer}>
                             <FaUserEdit className="inline-block mr-3 text-xl" />
                             My Profile
                         </NavLink>
                     </li>
+                   
 
                     {/* User Links */}
                     {!roleLoading && role === 'user' && (
