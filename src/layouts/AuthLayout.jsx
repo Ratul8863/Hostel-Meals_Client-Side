@@ -3,17 +3,20 @@ import { Outlet, Link } from 'react-router-dom';
 import login from "../assets/Lottie/Login.json" 
 import ProFastLogo from '../pages/shared/ProFastLogo/ProFastLogo'; 
 import Lottie from 'lottie-react';
+import useAuth from '../hooks/useAuth';
+import ProFastLogo2 from '../pages/shared/ProFastLogo/ProFastLogo2';
 
 const AuthLayout = () => {
+      const { theme } = useAuth();
     return (
         // Main container for the authentication layout
         // Ensures full viewport height, centers content, and applies a subtle gradient background
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-16 px-4 font-inter">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br  from-gray-50 to-gray-100 py-16 px-4 font-inter">
             
             {/* Logo positioned at the top-left, visible across the layout */}
             <div className="absolute top-0 left-0 p-8 z-10 w-full max-w-7xl mx-auto">
                 <Link to="/"> {/* Link logo back to home page */}
-                    <ProFastLogo className="text-gray-800 h-10" /> {/* Ensure ProFastLogo accepts className for styling */}
+                    <ProFastLogo2 className={`h-10 `} /> {/* Ensure ProFastLogo accepts className for styling */}
                 </Link>
             </div>
 

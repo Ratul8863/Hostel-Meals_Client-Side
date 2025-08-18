@@ -4,13 +4,15 @@ import { Link } from 'react-router-dom';
 import Lottie from 'lottie-react';
 import useAuth from '../../../hooks/useAuth';
 
-const ProFastLogo = () => {
+const ProFastLogo2 = () => {
   const { theme } = useAuth();
 
   return (
     <Link to="/">
       <div
-        className={`flex items-center gap-2 `}
+        className={`flex items-center gap-2 ${
+          theme === 'dark' ? 'text-gray-900' : ''
+        }`}
       >
         <Lottie
           animationData={logo}
@@ -26,4 +28,4 @@ const ProFastLogo = () => {
   );
 };
 
-export default ProFastLogo;
+export default ProFastLogo2;
